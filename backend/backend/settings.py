@@ -1,5 +1,5 @@
-import dotenv
 import os
+import dotenv
 
 from pathlib import Path
 
