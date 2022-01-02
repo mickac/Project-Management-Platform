@@ -5,8 +5,9 @@ from django.dispatch import receiver
 from phonenumber_field.modelfields import PhoneNumberField
 
 GEDNDER_CHOICES = [
-    ('Male', 'Female'),
-    ('Not specified'),
+    ('Male', 'Male'),
+    ('Female', 'Female'),
+    ('Not specified', 'Not specified'),
 ]
 
 
@@ -22,7 +23,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     gender = models.TextField(max_length=15, choices=GEDNDER_CHOICES)
     birth_date = models.DateField(null=True, blank=True)
-    phone_number = PhoneNumberField(required=False)
+    phone_number = PhoneNumberField()
 
 
 @receiver(post_save, sender=User)
