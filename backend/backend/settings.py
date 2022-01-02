@@ -25,6 +25,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
+    'rest_framework',
     "phonenumber_field",
     'project_management_system',
 ]
@@ -37,6 +39,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -90,6 +93,9 @@ USE_L10N = True
 
 USE_TZ = True
 
+CORS_ORIGIN_WHITELIST = [
+     'http://localhost:3000'
+]
 
 STATIC_URL = '/static/'
 
