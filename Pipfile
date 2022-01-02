@@ -15,6 +15,7 @@ psycopg2 = "*"
 django-phonenumber-field = {extras = ["phonenumberslite"],version = "*"}
 djangorestframework = "*"
 django-cors-headers = "*"
+whitenoise = "*"
 
 [requires]
 python_version = "3.7"
