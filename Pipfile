@@ -12,6 +12,7 @@ gunicorn = "*"
 django-heroku = "*"
 dj-database-url = "*"
 psycopg2 = "*"
+django-phonenumber-field = {extras = ["phonenumberslite"],version = "*"}
 
 [requires]
 python_version = "3.7"
