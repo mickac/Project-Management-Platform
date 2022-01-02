@@ -1,14 +1,13 @@
 from django.shortcuts import render
-from models import User
+from .models import User, Project
 from rest_framework import viewsets
-from .serializers import TodoSerializer
-from .models import Todo
+from .serializers import ProjectSerializer
 
 
 
-class TodoView(viewsets.ModelViewSet):
-    serializer_class = TodoSerializer
-    queryset = Todo.objects.all()
+class ProjectView(viewsets.ModelViewSet):
+    serializer_class = ProjectSerializer
+    queryset = Project.objects.all()
 
 def update_profile(request, user_id):
     user = User.objects.get(pk=user_id)
