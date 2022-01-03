@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+//import ProjectTable from './components/ProjectTable'
 import { DropdownButton, Dropdown } from 'react-bootstrap'
 import axios from 'axios';
 import Table from '@mui/material/Table';
@@ -8,6 +9,8 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import EditModal from "./components/Modals/EditModal";
+import DetailsModal from "./components/Modals/DetailsModal";
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
@@ -52,9 +55,43 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      viewCompleted: false,
+      viewInProgress: false,
+      viewNew: false,
       projectList: projectItems,
+      editModal: false,
+      detailsModal: false,
+      activeItem: {
+        title: "",
+        details: "",
+        start_date: "",
+        end_date: "",
+        status: "",
+      },
     };
   }
+
+  editToggle = () => {
+    this.setState({ editModal: !this.state.editModal });
+  };
+
+  detailsToggle = () => {
+    this.setState({ detailsModal: !this.state.detailsModal });
+  };
+
+  handleSubmit = (item) => {
+    this.toggle();
+
+    alert("save" + JSON.stringify(item));
+  };
+
+  editItem = (item) => {
+    this.setState({ activeItem: item, editModal: !this.state.editModal });
+  };
+
+  detailsItem = (item) => {
+    this.setState({ activeItem: item, detailsModal: !this.state.detailsModal });
+  };
 
   displayStatus = (statusCheck) => {
     if (statusCheck === 0) {
@@ -119,7 +156,7 @@ class App extends Component {
       return "New"
     }
   }
-
+  
   renderItems = () => {
     const newItems = this.state.projectList.filter(
       (item) => item.status === this.state.status
@@ -127,7 +164,7 @@ class App extends Component {
 
     return (
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+        <Table sx={{ minWidth: 650 }} size="large" aria-label="a dense table">
           <TableHead>
             <TableRow>
               <TableCell>Project name</TableCell>
@@ -151,9 +188,9 @@ class App extends Component {
                 <TableCell align="right">{ this.selectStatus(item.status) }</TableCell>
                 <TableCell align="right">
                   <DropdownButton id="dropdown-basic-button" title="More options">
-                    <Dropdown.Item href="#/action-1">Edit Project</Dropdown.Item>
+                    <Dropdown.Item onClick={() => this.editItem(item)}>Edit Project</Dropdown.Item>
                     <Dropdown.Item href="#/action-2">Add Comment</Dropdown.Item>
-                    <Dropdown.Item href="#/action-3">Details</Dropdown.Item>
+                    <Dropdown.Item onClick={() => this.detailsItem(item)}>Details</Dropdown.Item>
                     <Dropdown.Item href="#/action-3">Delete Project</Dropdown.Item>
                   </DropdownButton>
                 </TableCell>
@@ -162,6 +199,7 @@ class App extends Component {
           </TableBody>
         </Table>
       </TableContainer>
+
     );
   };
 
@@ -186,6 +224,20 @@ class App extends Component {
             </div>
           </div>
         </div>
+        {this.state.editModal ? (
+          <EditModal
+            activeItem={this.state.activeItem}
+            toggle={this.editToggle}
+            onSave={this.handleSubmit}
+          />
+        ) : null}
+        {this.state.detailsModal ? (
+          <DetailsModal
+            activeItem={this.state.activeItem}
+            toggle={this.detailsToggle}
+            onClose={()=>{this.setState({show:false})}}
+          />
+        ) : null}
       </main>
     );
   }
