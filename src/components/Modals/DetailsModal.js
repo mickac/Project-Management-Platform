@@ -3,6 +3,18 @@ import { Button, Modal, Form } from 'react-bootstrap'
 
 
 function DetailsModal({ activeItem, toggle, onClose }) {
+
+    let displayStatus = "";
+    if (activeItem.status === 0) {
+      displayStatus = "Completed";
+    }
+    if (activeItem.status === 1) {
+      displayStatus = "In progress";
+    }
+    if (activeItem.status === 2){
+      displayStatus = "New";
+    }
+
     return (
         <Modal
           show={toggle}
@@ -10,7 +22,7 @@ function DetailsModal({ activeItem, toggle, onClose }) {
           backdrop="static"
           keyboard={false}
         >
-          <Modal.Header closeButton>
+          <Modal.Header>
             <Modal.Title>Project details</Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -32,7 +44,7 @@ function DetailsModal({ activeItem, toggle, onClose }) {
             </Form.Group>
             <Form.Group className="mb-3">
                 <Form.Label>Status</Form.Label>
-                <Form.Control placeholder={ activeItem.status } disabled />
+                <Form.Control placeholder={ displayStatus } disabled />
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
