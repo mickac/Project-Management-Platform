@@ -15,7 +15,7 @@ import DetailsModal from "./components/Modals/DetailsModal";
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
-const projectItems =[
+const projectItems = [
   { 
     id: 1,
     title: "test",
@@ -50,6 +50,15 @@ const projectItems =[
   },
 ]
 
+const comments = [
+  {
+    user_id: 1,
+    project_id: 3,
+    first_name: "Michal",
+    last_name: "Kaczynski",
+    content: "Hello",
+  }
+]
 
 class App extends Component {
   constructor(props) {
@@ -67,6 +76,13 @@ class App extends Component {
         start_date: "",
         end_date: "",
         status: "",
+      },
+      activeComments: {
+        user_id: 1,
+        project_id: 3,
+        first_name: "Michal",
+        last_name: "Kaczynski",
+        content: "Hello",        
       },
     };
   }
@@ -217,25 +233,26 @@ class App extends Component {
                   Add Project
                 </button>
               </div>
-              {this.renderTabList()}
+              { this.renderTabList() }
               <ul className="list-group list-group-flush border-top-0">
-                {this.renderItems()}
+                { this.renderItems() }
               </ul>
             </div>
           </div>
         </div>
-        {this.state.editModal ? (
+        { this.state.editModal ? (
           <EditModal
-            activeItem={this.state.activeItem}
-            toggle={this.editToggle}
-            onSave={this.handleSubmit}
+            activeItem = { this.state.activeItem }
+            toggle = { this.editToggle }
+            onSave = { this.handleSubmit }
           />
         ) : null}
-        {this.state.detailsModal ? (
+        { this.state.detailsModal ? (
           <DetailsModal
-            activeItem={this.state.activeItem}
-            toggle={this.detailsToggle}
-            onClose={()=>{this.setState({show:false})}}
+            activeItem = { this.state.activeItem }
+            modalComments = { this.state.activeComments } //TODO KOMENTARZE
+            toggle = { this.detailsToggle }
+            onClose = { () => { this.setState({ show:false }) } }
           />
         ) : null}
       </main>

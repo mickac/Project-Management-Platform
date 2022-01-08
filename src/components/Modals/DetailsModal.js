@@ -1,8 +1,8 @@
 import React from "react";
 import { Button, Modal, Form } from 'react-bootstrap'
+import CommentsTable from './CommentsTable'
 
-
-function DetailsModal({ activeItem, toggle, onClose }) {
+function DetailsModal({ activeItem, modalComments, toggle, onClose }) {
 
     let displayStatus = "";
     if (activeItem.status === 0) {
@@ -11,7 +11,7 @@ function DetailsModal({ activeItem, toggle, onClose }) {
     if (activeItem.status === 1) {
       displayStatus = "In progress";
     }
-    if (activeItem.status === 2){
+    if (activeItem.status === 2) {
       displayStatus = "New";
     }
 
@@ -27,25 +27,29 @@ function DetailsModal({ activeItem, toggle, onClose }) {
           </Modal.Header>
           <Modal.Body>
             <Form.Group className="mb-3">
-                <Form.Label>Project title</Form.Label>
-                <Form.Control placeholder={ activeItem.title } disabled />
+                <Form.Label><b>Project title</b></Form.Label>
+                <Form.Control placeholder= { activeItem.title } disabled />
             </Form.Group>
             <Form.Group className="mb-3">
-                <Form.Label>Project details</Form.Label>
-                <Form.Control placeholder={ activeItem.details } disabled />
+                <Form.Label><b>Project details</b></Form.Label>
+                <Form.Control placeholder= { activeItem.details } disabled />
             </Form.Group>
             <Form.Group className="mb-3">
-                <Form.Label>Start date</Form.Label>
-                <Form.Control placeholder={ activeItem.start_date } disabled />
+                <Form.Label><b>Start date</b></Form.Label>
+                <Form.Control placeholder= { activeItem.start_date } disabled />
             </Form.Group>
             <Form.Group className="mb-3">
-                <Form.Label>End date</Form.Label>
-                <Form.Control placeholder={ activeItem.end_date } disabled />
+                <Form.Label><b>End date</b></Form.Label>
+                <Form.Control placeholder= { activeItem.end_date } disabled />
             </Form.Group>
             <Form.Group className="mb-3">
-                <Form.Label>Status</Form.Label>
-                <Form.Control placeholder={ displayStatus } disabled />
+                <Form.Label><b>Status</b></Form.Label>
+                <Form.Control placeholder= { displayStatus } disabled />
             </Form.Group>
+            <b>Comments section</b>
+            { modalComments ? (
+              <CommentsTable comments = { modalComments } />
+            ) : " No comments attached" }
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={toggle}>
