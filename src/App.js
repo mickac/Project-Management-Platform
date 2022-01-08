@@ -67,6 +67,8 @@ class App extends Component {
       viewCompleted: false,
       viewInProgress: false,
       viewNew: false,
+      toggle: false,
+      onClose: false,
       projectList: projectItems,
       editModal: false,
       detailsModal: false,
@@ -107,6 +109,18 @@ class App extends Component {
 
   detailsItem = (item) => {
     this.setState({ activeItem: item, detailsModal: !this.state.detailsModal });
+  };
+
+  handleChange = (e) => {
+    let { name,  value } = e.target;
+  
+    if (e.target.type === "checkbox") {
+      value = e.target.checked;
+    }
+  
+    const activeItem = { ...activeItem, [name]:  value };
+  
+    this.setState({ activeItem });
   };
 
   displayStatus = (statusCheck) => {
@@ -245,6 +259,8 @@ class App extends Component {
             activeItem = { this.state.activeItem }
             toggle = { this.editToggle }
             onSave = { this.handleSubmit }
+            onClose = { () => { this.setState({ show:false }) } }
+            handleChange = { () => {this.handleChange(this.state.activeItem)}}
           />
         ) : null}
         { this.state.detailsModal ? (

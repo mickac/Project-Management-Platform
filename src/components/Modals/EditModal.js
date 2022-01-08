@@ -1,112 +1,88 @@
 import React, { Component } from "react";
-import {
-  Button,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Form,
-  FormGroup,
-  Input,
-  Label,
-} from "reactstrap";
+import { Button, Modal, Form } from 'react-bootstrap'
 
-export default class EditModal extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      activeItem: this.props.activeItem,
-    };
-  }
-
-  handleChange = (e) => {
-    let { name, value } = e.target;
-
-    if (e.target.type === "checkbox") {
-      value = e.target.checked;
+function EditModal({ activeItem, toggle, onClose }) {
+    let displayStatus = "";
+    if (activeItem.status === 0) {
+      displayStatus = "Completed";
+    }
+    if (activeItem.status === 1) {
+      displayStatus = "In progress";
+    }
+    if (activeItem.status === 2) {
+      displayStatus = "New";
     }
 
-    const activeItem = { ...this.state.activeItem, [name]: value };
-
-    this.setState({ activeItem });
-  };
-
-  render() {
-    const { toggle, onSave } = this.props;
-
     return (
-      <Modal isOpen={true} toggle={toggle}>
-        <ModalHeader toggle={toggle}>Project edit</ModalHeader>
-        <ModalBody>
-          <Form>
-            <FormGroup>
-              <Label for="project-title">Title</Label>
-              <Input
-                type="text"
-                id="project-title"
-                name="title"
-                value={this.state.activeItem.title}
-                onChange={this.handleChange}
-                placeholder="Enter Project Title"
+        <Modal
+          show={ toggle }
+          onHide={ onClose }
+          backdrop="static"
+          keyboard={ false }
+        >
+          <Modal.Header>
+            <Modal.Title>Project details</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Group className="mb-3">
+              <Form.Label>Title</Form.Label>
+              <Form.Control
+                type = "text"
+                id = "project-title"
+                name = "title"
+                defaultValue = { activeItem.title }
               />
-            </FormGroup>
-            <FormGroup>
-              <Label for="project-details">Details</Label>
-              <Input
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Details</Form.Label>
+              <Form.Control
                 type="text"
                 id="project-details"
                 name="details"
-                value={this.state.activeItem.details}
-                onChange={this.handleChange}
-                placeholder="Enter project details"
+                defaultValue = { activeItem.details }
               />
-            </FormGroup>
-            <FormGroup>
-              <Label for="project-start-date">Start date</Label>
-              <Input
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Start date</Form.Label>
+              <Form.Control
                 type="date"
                 id="project-start-date"
                 name="start-date"
-                value={this.state.activeItem.start_date}
-                onChange={this.handleChange}
-                placeholder="Enter project start date"
+                defaultValue = { activeItem.start_date }
               />
-            </FormGroup>
-            <FormGroup>
-              <Label for="project-end-date">End date</Label>
-              <Input
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>End date</Form.Label>
+              <Form.Control
                 type="date"
                 id="project-end-date"
                 name="end-date"
-                value={this.state.activeItem.end_date}
-                onChange={this.handleChange}
-                placeholder="Enter project end date"
+                defaultValue = { activeItem.end_date }
               />
-            </FormGroup>
-            <FormGroup>
-              <Label for="project-status">Status</Label>
-                <Input
-                  type="select"
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Status</Form.Label>
+                <Form.Control as = "select"
                   id="project-status"
                   name="status"
-                  placeholder="Select status"
+                  defaultValue = { activeItem.status }
                 >
                 <option value={2}>New</option>
                 <option value={1}>In progress</option>
                 <option value={0}>Completed</option>
-                </Input>
-            </FormGroup>
-          </Form>
-        </ModalBody>
-        <ModalFooter>
-          <Button
-            color="success"
-            onClick={() => onSave(this.state.activeItem)}
-          >
-            Save
-          </Button>
-        </ModalFooter>
-      </Modal>
+                </Form.Control>
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="danger" onClick={toggle}>
+              Close
+            </Button>
+            <Button variant="primary" onClick={toggle}>
+              Edit
+            </Button>
+          </Modal.Footer>
+        </Modal>
     );
   }
-}
+  
+export default EditModal

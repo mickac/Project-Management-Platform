@@ -3,7 +3,9 @@ import { Button, Modal, Form } from 'react-bootstrap'
 import CommentsTable from './CommentsTable'
 
 function DetailsModal({ activeItem, modalComments, toggle, onClose }) {
-
+  console.log(activeItem)
+  console.log(toggle)
+  console.log(onClose)
     let displayStatus = "";
     if (activeItem.status === 0) {
       displayStatus = "Completed";
@@ -17,10 +19,10 @@ function DetailsModal({ activeItem, modalComments, toggle, onClose }) {
 
     return (
         <Modal
-          show={toggle}
-          onHide={onClose}
+          show={ toggle }
+          onHide={ onClose }
           backdrop="static"
-          keyboard={false}
+          keyboard={ false }
         >
           <Modal.Header>
             <Modal.Title>Project details</Modal.Title>
