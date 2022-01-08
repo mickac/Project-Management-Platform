@@ -1,10 +1,10 @@
 import React, { Component, useState } from "react";
 import { Button, Modal, Form } from 'react-bootstrap'
 
-function EditModal({ activeItem, toggle, onClose }) {
-  const [isConfirm, setIsConfirm] = useState(false)
-  const toggleConfirm = () => {
-    setIsConfirm(current => !current)
+function EditModal({ activeItem, toggleEdit, onClose }) {
+  const [isEditConfirm, setIsEditConfirm] = useState(false)
+  const toggleEditConfirm = () => {
+    setIsEditConfirm(current => !current)
   }
 
   let displayStatus = "";
@@ -20,7 +20,7 @@ function EditModal({ activeItem, toggle, onClose }) {
 
   return (
       <Modal
-        show={ toggle }
+        show={ toggleEdit }
         onHide={ onClose }
         backdrop="static"
         keyboard={ false }
@@ -36,7 +36,7 @@ function EditModal({ activeItem, toggle, onClose }) {
               id = "project-title"
               name = "title"
               defaultValue = { activeItem.title }
-              disabled = { isConfirm ? "disabled" : ""}  
+              disabled = { isEditConfirm ? "disabled" : ""}  
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -46,7 +46,7 @@ function EditModal({ activeItem, toggle, onClose }) {
               id="project-details"
               name="details"
               defaultValue = { activeItem.details }
-              disabled = { isConfirm ? "disabled" : ""}  
+              disabled = { isEditConfirm ? "disabled" : ""}  
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -56,7 +56,7 @@ function EditModal({ activeItem, toggle, onClose }) {
               id="project-start-date"
               name="start-date"
               defaultValue = { activeItem.start_date }
-              disabled = { isConfirm ? "disabled" : ""}  
+              disabled = { isEditConfirm ? "disabled" : ""}  
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -66,7 +66,7 @@ function EditModal({ activeItem, toggle, onClose }) {
               id="project-end-date"
               name="end-date"
               defaultValue = { activeItem.end_date }
-              disabled = { isConfirm ? "disabled" : ""}  
+              disabled = { isEditConfirm ? "disabled" : ""}  
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -75,7 +75,7 @@ function EditModal({ activeItem, toggle, onClose }) {
                 id="project-status"
                 name="status"
                 defaultValue = { activeItem.status }
-                disabled = { isConfirm ? "disabled" : ""}  
+                disabled = { isEditConfirm ? "disabled" : ""}  
               >
               <option value={2}>New</option>
               <option value={1}>In progress</option>
@@ -83,26 +83,26 @@ function EditModal({ activeItem, toggle, onClose }) {
               </Form.Control>
           </Form.Group>
         </Modal.Body>
-        <Modal.Footer>{ isConfirm ? 
+        <Modal.Footer>{ isEditConfirm ? 
         (
-          <Button variant="warning" onClick={toggleConfirm}>
+          <Button variant="warning" onClick={toggleEditConfirm}>
             Cancel
           </Button>
         )
         :
         (
-          <Button variant="danger" onClick={toggle}>
+          <Button variant="danger" onClick={toggleEdit}>
             Close
           </Button>
         )}  
-        { isConfirm ? (      
-          <Button variant="success" onClick={toggle}>
+        { isEditConfirm ? (      
+          <Button variant="success" onClick={toggleEdit}>
             Apply Changes
           </Button>
           ) 
           : 
           (
-          <Button variant="primary" onClick={toggleConfirm}>
+          <Button variant="primary" onClick={toggleEditConfirm}>
             Edit
           </Button>
           )

@@ -16,6 +16,7 @@ import AddCommentIcon from '@mui/icons-material/AddComment';
 import ListIcon from '@mui/icons-material/List';
 import EditModal from "./components/Modals/EditModal";
 import DetailsModal from "./components/Modals/DetailsModal";
+import CreateModal from "./components/Modals/CreateModal";
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
@@ -72,9 +73,12 @@ class App extends Component {
       viewCompleted: false,
       viewInProgress: false,
       viewNew: false,
-      toggle: false,
+      toggleCreate: false,
+      toggleEdit: false,
+      toggleDetails: false,
       onClose: false,
       projectList: projectItems,
+      createModal: false,
       editModal: false,
       detailsModal: false,
       activeItem: {
@@ -93,6 +97,10 @@ class App extends Component {
       },
     };
   }
+  
+  createToggle = () => {
+    this.setState({ createModal: !this.state.createModal });
+  }
 
   editToggle = () => {
     this.setState({ editModal: !this.state.editModal });
@@ -107,6 +115,10 @@ class App extends Component {
 
     alert("save" + JSON.stringify(item));
   };
+
+  createItem = () => {
+    this.setState({ createModal: !this.state.createModal });    
+  }
 
   editItem = (item) => {
     this.setState({ activeItem: item, editModal: !this.state.editModal });
@@ -259,8 +271,12 @@ class App extends Component {
           <div className="col-md-10 col-sm-10 mx-auto p-0">
             <div className="card p-3">
               <div className="mb-4">
+                <div className="float-right">
+                  Logged as first-name last-name (email) | Logout
+                </div>
                 <button
                   className="btn btn-primary"
+                  onClick={() => this.createItem()}
                 >
                   Add Project
                 </button>
@@ -272,10 +288,17 @@ class App extends Component {
             </div>
           </div>
         </div>
+        { this.state.createModal ? (
+          <CreateModal
+            toggleCreate = { this.createToggle }
+            onSave = { this.handleSubmit }
+            onClose = { () => { this.setState({ show:false }) } }
+          />
+        ) : null}
         { this.state.editModal ? (
           <EditModal
             activeItem = { this.state.activeItem }
-            toggle = { this.editToggle }
+            toggleEdit = { this.editToggle }
             onSave = { this.handleSubmit }
             onClose = { () => { this.setState({ show:false }) } }
             handleChange = { () => {this.handleChange(this.state.activeItem)}}
@@ -285,7 +308,7 @@ class App extends Component {
           <DetailsModal
             activeItem = { this.state.activeItem }
             modalComments = { this.state.activeComments } //TODO KOMENTARZE
-            toggle = { this.detailsToggle }
+            toggleDetails = { this.detailsToggle }
             onClose = { () => { this.setState({ show:false }) } }
           />
         ) : null}

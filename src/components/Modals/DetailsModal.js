@@ -2,10 +2,7 @@ import React from "react";
 import { Button, Modal, Form } from 'react-bootstrap'
 import CommentsTable from './CommentsTable'
 
-function DetailsModal({ activeItem, modalComments, toggle, onClose }) {
-  console.log(activeItem)
-  console.log(toggle)
-  console.log(onClose)
+function DetailsModal({ activeItem, modalComments, toggleDetails, onClose }) {
     let displayStatus = "";
     if (activeItem.status === 0) {
       displayStatus = "Completed";
@@ -19,7 +16,7 @@ function DetailsModal({ activeItem, modalComments, toggle, onClose }) {
 
     return (
         <Modal
-          show={ toggle }
+          show={ toggleDetails }
           onHide={ onClose }
           backdrop="static"
           keyboard={ false }
@@ -54,7 +51,7 @@ function DetailsModal({ activeItem, modalComments, toggle, onClose }) {
             ) : " No comments attached" }
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={toggle}>
+            <Button variant="primary" onClick={toggleDetails}>
               Close
             </Button>
           </Modal.Footer>
