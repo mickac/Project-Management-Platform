@@ -9,6 +9,11 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Tooltip from '@mui/material/Tooltip';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import CreateIcon from '@mui/icons-material/Create';
+import AddCommentIcon from '@mui/icons-material/AddComment';
+import ListIcon from '@mui/icons-material/List';
 import EditModal from "./components/Modals/EditModal";
 import DetailsModal from "./components/Modals/DetailsModal";
 
@@ -186,7 +191,14 @@ class App extends Component {
       return "New"
     }
   }
-  
+ /*
+                   <DropdownButton id="dropdown-basic-button" title="More options">
+                    <Dropdown.Item onClick={() => this.editItem(item)}>Edit Project</Dropdown.Item>
+                    <Dropdown.Item href="#/action-2">Add Comment</Dropdown.Item>
+                    <Dropdown.Item onClick={() => this.detailsItem(item)}>Details</Dropdown.Item>
+                    <Dropdown.Item href="#/action-3">Delete Project</Dropdown.Item>
+                  </DropdownButton>
+ */
   renderItems = () => {
     const newItems = this.state.projectList.filter(
       (item) => item.status === this.state.status
@@ -217,12 +229,18 @@ class App extends Component {
                 <TableCell align="right">{ item.end_date }</TableCell>
                 <TableCell align="right">{ this.selectStatus(item.status) }</TableCell>
                 <TableCell align="right">
-                  <DropdownButton id="dropdown-basic-button" title="More options">
-                    <Dropdown.Item onClick={() => this.editItem(item)}>Edit Project</Dropdown.Item>
-                    <Dropdown.Item href="#/action-2">Add Comment</Dropdown.Item>
-                    <Dropdown.Item onClick={() => this.detailsItem(item)}>Details</Dropdown.Item>
-                    <Dropdown.Item href="#/action-3">Delete Project</Dropdown.Item>
-                  </DropdownButton>
+                <Tooltip title="Edit project">
+                  <CreateIcon onClick={() => this.editItem(item)} />
+                </Tooltip>
+                <Tooltip title="Add comment">
+                  <AddCommentIcon href="#/action-3" />
+                </Tooltip>
+                <Tooltip title="View details">
+                  <ListIcon onClick={() => this.detailsItem(item)} />
+                </Tooltip>
+                <Tooltip title="Delete project">
+                  <DeleteForeverIcon href="#/action-3" />
+                </Tooltip>
                 </TableCell>
               </TableRow>
             ))}
