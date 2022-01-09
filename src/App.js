@@ -17,6 +17,7 @@ import ListIcon from '@mui/icons-material/List';
 import EditModal from "./components/Modals/EditModal";
 import DetailsModal from "./components/Modals/DetailsModal";
 import CreateModal from "./components/Modals/CreateModal";
+import CommentModal from "./components/Modals/CommentModal";
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
@@ -77,11 +78,13 @@ class App extends Component {
       toggleCreate: false,
       toggleEdit: false,
       toggleDetails: false,
+      toggleComment: false,
       onClose: false,
       projectList: projectItems,
       createModal: false,
       editModal: false,
       detailsModal: false,
+      commentModal: false,
       activeItem: {
         title: "",
         details: "",
@@ -113,6 +116,10 @@ class App extends Component {
     this.setState({ detailsModal: !this.state.detailsModal });
   };
 
+  commentToggle = () => {
+    this.setState({ commentModal: !this.state.commentModal });
+  };
+
   handleSubmit = (item) => {
     this.toggle();
 
@@ -129,6 +136,10 @@ class App extends Component {
 
   detailsItem = (item) => {
     this.setState({ activeItem: item, detailsModal: !this.state.detailsModal });
+  };
+
+  commentItem = (item) => {
+    this.setState({ activeItem: item, commentModal: !this.state.commentModal });
   };
 
   handleChange = (e) => {
@@ -248,7 +259,7 @@ class App extends Component {
                   <CreateIcon onClick={() => this.editItem(item)} />
                 </Tooltip>
                 <Tooltip title="Add comment">
-                  <AddCommentIcon href="#/action-3" />
+                  <AddCommentIcon onClick={() => this.commentItem(item)} />
                 </Tooltip>
                 <Tooltip title="View details">
                   <ListIcon onClick={() => this.detailsItem(item)} />
@@ -312,6 +323,13 @@ class App extends Component {
             activeItem = { this.state.activeItem }
             modalComments = { this.state.activeComments } //TODO KOMENTARZE
             toggleDetails = { this.detailsToggle }
+            onClose = { () => { this.setState({ show:false }) } }
+          />
+        ) : null}
+        { this.state.commentModal ? (
+          <CommentModal
+            activeItem = { this.state.activeItem }
+            toggleComment = { this.commentToggle }
             onClose = { () => { this.setState({ show:false }) } }
           />
         ) : null}
