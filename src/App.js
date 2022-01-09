@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+//import ProjectTable from './components/ProjectTable'
+import { DropdownButton, Dropdown } from 'react-bootstrap'
 import axios from 'axios';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -7,11 +9,19 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Tooltip from '@mui/material/Tooltip';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import CreateIcon from '@mui/icons-material/Create';
+import AddCommentIcon from '@mui/icons-material/AddComment';
+import ListIcon from '@mui/icons-material/List';
+import EditModal from "./components/Modals/EditModal";
+import DetailsModal from "./components/Modals/DetailsModal";
+import CreateModal from "./components/Modals/CreateModal";
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
-const projectItems =[
+const projectItems = [
   { 
     id: 1,
     title: "test",
@@ -20,17 +30,118 @@ const projectItems =[
     end_date: "2022-01-09",
     status: 2,
   },
+  { 
+    id: 2,
+    title: "test1",
+    details: "test",
+    start_date: "2022-01-02",
+    end_date: "2022-01-09",
+    status: 0,
+  },
+  { 
+    id: 3,
+    title: "test2",
+    details: "test",
+    start_date: "2022-01-02",
+    end_date: "2022-01-09",
+    status: 1,
+  },
+  { 
+    id: 4,
+    title: "test3",
+    details: "test",
+    start_date: "2022-01-02",
+    end_date: "2022-01-09",
+    status: 2,
+  },
 ]
 
+const comments = [
+  {
+    id: 1,
+    user_id: 1,
+    project_id: 3,
+    first_name: "Michal",
+    last_name: "Kaczynski",
+    content: "Hello",
+  }
+]
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      viewInProgress: true,
+      viewCompleted: false,
+      viewInProgress: false,
+      viewNew: false,
+      toggleCreate: false,
+      toggleEdit: false,
+      toggleDetails: false,
+      onClose: false,
       projectList: projectItems,
+      createModal: false,
+      editModal: false,
+      detailsModal: false,
+      activeItem: {
+        title: "",
+        details: "",
+        start_date: "",
+        end_date: "",
+        status: "",
+      },
+      activeComments: {
+        id: 1,
+        user_id: 1,
+        project_id: 3,
+        first_name: "Michal",
+        last_name: "Kaczynski",
+        content: "Hello",    
+        added: "7/30/2017 8:26:40 AM",    
+      },
     };
   }
+  
+  createToggle = () => {
+    this.setState({ createModal: !this.state.createModal });
+  }
+
+  editToggle = () => {
+    this.setState({ editModal: !this.state.editModal });
+  };
+
+  detailsToggle = () => {
+    this.setState({ detailsModal: !this.state.detailsModal });
+  };
+
+  handleSubmit = (item) => {
+    this.toggle();
+
+    alert("save" + JSON.stringify(item));
+  };
+
+  createItem = () => {
+    this.setState({ createModal: !this.state.createModal });    
+  }
+
+  editItem = (item) => {
+    this.setState({ activeItem: item, editModal: !this.state.editModal });
+  };
+
+  detailsItem = (item) => {
+    this.setState({ activeItem: item, detailsModal: !this.state.detailsModal });
+  };
+
+  handleChange = (e) => {
+    let { name,  value } = e.target;
+  
+    if (e.target.type === "checkbox") {
+      value = e.target.checked;
+    }
+  
+    const activeItem = { ...activeItem, [name]:  value };
+  
+    this.setState({ activeItem });
+  };
 
   displayStatus = (statusCheck) => {
     if (statusCheck === 0) {
@@ -84,6 +195,25 @@ class App extends Component {
     );
   };
 
+  selectStatus = (status) => {
+    if (status === 0){
+      return "Completed"
+    }
+    if (status === 1){
+      return "In progress"
+    }
+    if (status === 2){
+      return "New"
+    }
+  }
+ /*
+                   <DropdownButton id="dropdown-basic-button" title="More options">
+                    <Dropdown.Item onClick={() => this.editItem(item)}>Edit Project</Dropdown.Item>
+                    <Dropdown.Item href="#/action-2">Add Comment</Dropdown.Item>
+                    <Dropdown.Item onClick={() => this.detailsItem(item)}>Details</Dropdown.Item>
+                    <Dropdown.Item href="#/action-3">Delete Project</Dropdown.Item>
+                  </DropdownButton>
+ */
   renderItems = () => {
     const newItems = this.state.projectList.filter(
       (item) => item.status === this.state.status
@@ -91,7 +221,7 @@ class App extends Component {
 
     return (
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+        <Table sx={{ minWidth: 650 }} size="large" aria-label="a dense table">
           <TableHead>
             <TableRow>
               <TableCell>Project name</TableCell>
@@ -104,21 +234,35 @@ class App extends Component {
           <TableBody>
             {newItems.map((item) =>  (
               <TableRow
-                key={item.id}
+                key={ item.id }
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
-                  {item.title}
+                  { item.title }
                 </TableCell>
-                <TableCell align="right">{item.start_date}</TableCell>
-                <TableCell align="right">{item.end_date}</TableCell>
-                <TableCell align="right">{item.status}</TableCell>
-                <TableCell align="right">TBD</TableCell>
+                <TableCell align="right">{ item.start_date }</TableCell>
+                <TableCell align="right">{ item.end_date }</TableCell>
+                <TableCell align="right">{ this.selectStatus(item.status) }</TableCell>
+                <TableCell align="right">
+                <Tooltip title="Edit project">
+                  <CreateIcon onClick={() => this.editItem(item)} />
+                </Tooltip>
+                <Tooltip title="Add comment">
+                  <AddCommentIcon href="#/action-3" />
+                </Tooltip>
+                <Tooltip title="View details">
+                  <ListIcon onClick={() => this.detailsItem(item)} />
+                </Tooltip>
+                <Tooltip title="Delete project">
+                  <DeleteForeverIcon href="#/action-3" />
+                </Tooltip>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+
     );
   };
 
@@ -130,19 +274,47 @@ class App extends Component {
           <div className="col-md-10 col-sm-10 mx-auto p-0">
             <div className="card p-3">
               <div className="mb-4">
+                <div className="float-right">
+                  Logged as first-name last-name (email) | Logout
+                </div>
                 <button
                   className="btn btn-primary"
+                  onClick={() => this.createItem()}
                 >
                   Add Project
                 </button>
               </div>
-              {this.renderTabList()}
+              { this.renderTabList() }
               <ul className="list-group list-group-flush border-top-0">
-                {this.renderItems()}
+                { this.renderItems() }
               </ul>
             </div>
           </div>
         </div>
+        { this.state.createModal ? (
+          <CreateModal
+            toggleCreate = { this.createToggle }
+            onSave = { this.handleSubmit }
+            onClose = { () => { this.setState({ show:false }) } }
+          />
+        ) : null}
+        { this.state.editModal ? (
+          <EditModal
+            activeItem = { this.state.activeItem }
+            toggleEdit = { this.editToggle }
+            onSave = { this.handleSubmit }
+            onClose = { () => { this.setState({ show:false }) } }
+            handleChange = { () => {this.handleChange(this.state.activeItem)}}
+          />
+        ) : null}
+        { this.state.detailsModal ? (
+          <DetailsModal
+            activeItem = { this.state.activeItem }
+            modalComments = { this.state.activeComments } //TODO KOMENTARZE
+            toggleDetails = { this.detailsToggle }
+            onClose = { () => { this.setState({ show:false }) } }
+          />
+        ) : null}
       </main>
     );
   }
