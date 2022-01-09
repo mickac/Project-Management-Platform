@@ -18,10 +18,11 @@ import EditModal from "./components/Modals/EditModal";
 import DetailsModal from "./components/Modals/DetailsModal";
 import CreateModal from "./components/Modals/CreateModal";
 import CommentModal from "./components/Modals/CommentModal";
+import DeleteModal from "./components/Modals/DeleteModal";
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-
+/*
 const projectItems = [
   { 
     id: 1,
@@ -67,7 +68,7 @@ const comments = [
     content: "Hello",
   }
 ]
-
+*/
 class App extends Component {
   constructor(props) {
     super(props);
@@ -80,10 +81,11 @@ class App extends Component {
       toggleDetails: false,
       toggleComment: false,
       onClose: false,
-      projectList: projectItems,
+      projectList: [],
       createModal: false,
       editModal: false,
       detailsModal: false,
+      deleteModal: false,
       commentModal: false,
       activeItem: {
         title: "",
@@ -103,7 +105,40 @@ class App extends Component {
       },
     };
   }
-  
+
+  componentDidMount() {
+    this.refreshList();
+
+  }
+
+  refreshList = () => {
+    axios
+      .get("/api/projects/")
+      .then((res) => this.setState({ projectList: res.data }))
+      .catch((err) => console.log(err));
+  };
+
+  handleSubmit = (item) => {
+    this.editToggle();
+    console.log(item)
+    if (item.id) {
+      axios
+        .put(`/api/projects/${item.id}/`, item)
+        .then((res) => this.refreshList());
+      return;
+    }
+    axios
+      .post("/api/projects/", item)
+      .then((res) => this.refreshList());
+  };
+
+  handleDelete = (item) => {
+    this.deleteToggle()
+    axios
+      .delete(`/api/projects/${item.id}/`)
+      .then((res) => this.refreshList());
+  };
+
   createToggle = () => {
     this.setState({ createModal: !this.state.createModal });
   }
@@ -120,10 +155,8 @@ class App extends Component {
     this.setState({ commentModal: !this.state.commentModal });
   };
 
-  handleSubmit = (item) => {
-    this.toggle();
-
-    alert("save" + JSON.stringify(item));
+  deleteToggle = () => {
+    this.setState({ deleteModal: !this.state.deleteModal });
   };
 
   createItem = () => {
@@ -140,6 +173,10 @@ class App extends Component {
 
   commentItem = (item) => {
     this.setState({ activeItem: item, commentModal: !this.state.commentModal });
+  };
+
+  deleteItem = (item) => {
+    this.setState({ activeItem: item, deleteModal: !this.state.deleteModal });
   };
 
   handleChange = (e) => {
@@ -265,7 +302,7 @@ class App extends Component {
                   <ListIcon onClick={() => this.detailsItem(item)} />
                 </Tooltip>
                 <Tooltip title="Delete project">
-                  <DeleteForeverIcon href="#/action-3" />
+                  <DeleteForeverIcon onClick={() => this.deleteItem(item)} />
                 </Tooltip>
                 </TableCell>
               </TableRow>
@@ -330,6 +367,14 @@ class App extends Component {
           <CommentModal
             activeItem = { this.state.activeItem }
             toggleComment = { this.commentToggle }
+            onClose = { () => { this.setState({ show:false }) } }
+          />
+        ) : null}
+        { this.state.deleteModal ? (
+          <DeleteModal
+            activeItem = { this.state.activeItem }
+            toggleDelete = { this.deleteToggle }
+            deleteItem = { this.handleDelete }
             onClose = { () => { this.setState({ show:false }) } }
           />
         ) : null}

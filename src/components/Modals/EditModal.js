@@ -1,7 +1,7 @@
 import React, { Component, useState } from "react";
 import { Button, Modal, Form } from 'react-bootstrap'
 
-function EditModal({ activeItem, toggleEdit, onClose }) {
+function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
   const [isEditConfirm, setIsEditConfirm] = useState(false)
   const toggleEditConfirm = () => {
     setIsEditConfirm(current => !current)
@@ -97,7 +97,7 @@ function EditModal({ activeItem, toggleEdit, onClose }) {
           </Button>
         )}  
         { isEditConfirm ? (      
-          <Button variant="success" onClick={toggleEdit}>
+          <Button variant="success" onClick={() => onSave(activeItem)}>
             Apply Changes
           </Button>
           ) 
