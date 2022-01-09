@@ -82,6 +82,7 @@ function EditModal({ activeItem, toggleEdit, onClose }) {
               <option value={0}>Completed</option>
               </Form.Control>
           </Form.Group>
+          { isEditConfirm ? "Please check all fields and confirm editing by pressing Apply Changes." : ""}  
         </Modal.Body>
         <Modal.Footer>{ isEditConfirm ? 
         (

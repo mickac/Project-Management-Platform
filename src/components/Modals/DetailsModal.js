@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Modal, Form } from 'react-bootstrap'
+import { Button, Modal, Form} from 'react-bootstrap'
 import CommentsTable from './CommentsTable'
 
 function DetailsModal({ activeItem, modalComments, toggleDetails, onClose }) {

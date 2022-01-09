@@ -58,6 +58,7 @@ const projectItems = [
 
 const comments = [
   {
+    id: 1,
     user_id: 1,
     project_id: 3,
     first_name: "Michal",
@@ -89,11 +90,13 @@ class App extends Component {
         status: "",
       },
       activeComments: {
+        id: 1,
         user_id: 1,
         project_id: 3,
         first_name: "Michal",
         last_name: "Kaczynski",
-        content: "Hello",        
+        content: "Hello",    
+        added: "7/30/2017 8:26:40 AM",    
       },
     };
   }
