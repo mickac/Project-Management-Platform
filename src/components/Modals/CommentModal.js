@@ -15,7 +15,7 @@ function CommentModal({ activeItem, toggleComment, onClose }) {
         keyboard={ false }
       >
         <Modal.Header>
-          <Modal.Title>Create new project</Modal.Title>
+          <Modal.Title>Adding comment section</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form.Group className="mb-3">
