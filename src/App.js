@@ -108,7 +108,6 @@ class App extends Component {
 
   componentDidMount() {
     this.refreshList();
-
   }
 
   refreshList = () => {
@@ -118,7 +117,7 @@ class App extends Component {
       .catch((err) => console.log(err));
   };
 
-  handleSubmit = (item) => {
+  handleEdit = (item) => {
     this.editToggle();
     console.log(item)
     if (item.id) {
@@ -127,6 +126,10 @@ class App extends Component {
         .then((res) => this.refreshList());
       return;
     }
+  };
+
+  handleCreate = (item) => {
+    this.createToggle();
     axios
       .post("/api/projects/", item)
       .then((res) => this.refreshList());
@@ -161,7 +164,7 @@ class App extends Component {
 
   createItem = () => {
     this.setState({ createModal: !this.state.createModal });    
-  }
+  };
 
   editItem = (item) => {
     this.setState({ activeItem: item, editModal: !this.state.editModal });
@@ -342,7 +345,7 @@ class App extends Component {
         { this.state.createModal ? (
           <CreateModal
             toggleCreate = { this.createToggle }
-            onSave = { this.handleSubmit }
+            onSave = { this.handleCreate }
             onClose = { () => { this.setState({ show:false }) } }
           />
         ) : null}
@@ -350,7 +353,7 @@ class App extends Component {
           <EditModal
             activeItem = { this.state.activeItem }
             toggleEdit = { this.editToggle }
-            onSave = { this.handleSubmit }
+            onSave = { this.handleEdit }
             onClose = { () => { this.setState({ show:false }) } }
             handleChange = { () => {this.handleChange(this.state.activeItem)}}
           />

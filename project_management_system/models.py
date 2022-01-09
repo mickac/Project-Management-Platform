@@ -15,7 +15,7 @@ class Project(models.Model):
     details = models.CharField(max_length=500)
     start_date = models.DateField()
     end_date = models.DateField()
-    status = models.IntegerField()
+    status = models.IntegerField(default=2)
     added = models.DateTimeField(auto_now_add=True, blank=True)
 
 

@@ -2,6 +2,7 @@ import React, { Component, useState } from "react";
 import { Button, Modal, Form } from 'react-bootstrap'
 
 function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
+  const [currentItem, setCurrentItem] = useState(activeItem) //useForm - na przyszłość
   const [isEditConfirm, setIsEditConfirm] = useState(false)
   const toggleEditConfirm = () => {
     setIsEditConfirm(current => !current)
@@ -37,6 +38,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
               name = "title"
               defaultValue = { activeItem.title }
               disabled = { isEditConfirm ? "disabled" : ""}  
+              onChange = {(e) => setCurrentItem({...currentItem, title: e.target.value})}
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -47,6 +49,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
               name="details"
               defaultValue = { activeItem.details }
               disabled = { isEditConfirm ? "disabled" : ""}  
+              onChange = {(e) => setCurrentItem({...currentItem, details: e.target.value})}
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -57,6 +60,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
               name="start-date"
               defaultValue = { activeItem.start_date }
               disabled = { isEditConfirm ? "disabled" : ""}  
+              onChange = {(e) => setCurrentItem({...currentItem, start_date: e.target.value})}
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -67,6 +71,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
               name="end-date"
               defaultValue = { activeItem.end_date }
               disabled = { isEditConfirm ? "disabled" : ""}  
+              onChange = {(e) => setCurrentItem({...currentItem, end_date: e.target.value})}
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -76,6 +81,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
                 name="status"
                 defaultValue = { activeItem.status }
                 disabled = { isEditConfirm ? "disabled" : ""}  
+                onChange = {(e) => setCurrentItem({...currentItem, status:e.target.value})}
               >
               <option value={2}>New</option>
               <option value={1}>In progress</option>
@@ -97,7 +103,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
           </Button>
         )}  
         { isEditConfirm ? (      
-          <Button variant="success" onClick={() => onSave(activeItem)}>
+          <Button variant="success" type="submit" onClick={() => onSave(currentItem)}>
             Apply Changes
           </Button>
           ) 

@@ -1,7 +1,8 @@
 import React, { Component, useState } from "react";
 import { Button, Modal, Form } from 'react-bootstrap'
 
-function CreateModal({ toggleCreate, onClose }) {
+function CreateModal({ toggleCreate, onClose, onSave }) {
+  const [currentItem, setCurrentItem] = useState()
   const [isCreateConfirm, setIsConfirm] = useState(false)
   const toggleCreateConfirm = () => {
     setIsConfirm(current => !current)
@@ -26,6 +27,7 @@ function CreateModal({ toggleCreate, onClose }) {
               name = "title"
               placeholder = "Enter title of the project"
               disabled = { isCreateConfirm ? "disabled" : ""}  
+              onChange = {(e) => setCurrentItem({...currentItem, title: e.target.value})}
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -36,6 +38,7 @@ function CreateModal({ toggleCreate, onClose }) {
               name="details"
               placeholder = "Enter details of the project"
               disabled = { isCreateConfirm ? "disabled" : ""}  
+              onChange = {(e) => setCurrentItem({...currentItem, details: e.target.value})}
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -45,6 +48,7 @@ function CreateModal({ toggleCreate, onClose }) {
               id="project-start-date"
               name="start-date"
               disabled = { isCreateConfirm ? "disabled" : ""}  
+              onChange = {(e) => setCurrentItem({...currentItem, start_date: e.target.value})}
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -54,6 +58,7 @@ function CreateModal({ toggleCreate, onClose }) {
               id="project-end-date"
               name="end-date"
               disabled = { isCreateConfirm ? "disabled" : ""}  
+              onChange = {(e) => setCurrentItem({...currentItem, end_date: e.target.value})}
             />
           </Form.Group>
           { isCreateConfirm ? "Note: Status of the new project will be set on 'New'. Please check all fields and confirm by pressing Apply Creation." : ""}  
@@ -71,7 +76,7 @@ function CreateModal({ toggleCreate, onClose }) {
           </Button>
         )}  
         { isCreateConfirm ? (      
-          <Button variant="success" onClick={toggleCreate}>
+          <Button variant="success" type="submit" onClick={() => onSave(currentItem)}>
             Apply creation
           </Button>
           ) 
