@@ -1,8 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Modal, Form} from 'react-bootstrap'
+import axios from 'axios';
 import CommentsTable from './CommentsTable'
+import LoopIcon from '@mui/icons-material/Loop';
 
-function DetailsModal({ activeItem, modalComments, toggleDetails, onClose }) {
+function DetailsModal({ activeItem, toggleDetails, onClose }) {
+    
+    const [currentComments ,setCurrentComments] = useState([])
+    const [loadingScreen, setLoadingScreen] = useState(true)
+    useEffect(() => {
+      let isCancelled = false;
+      axios
+        .get(`/api/comments/${activeItem.id}/`, activeItem)
+        .then((res) => setCurrentComments( Object.values(res.data) ))
+        .then(() => {
+          if (!isCancelled){
+            setLoadingScreen(false);
+          }
+        })
+        .catch((err) => console.log(err));     
+        
+        return () => {
+          isCancelled = true;
+        }
+    }, []);
+    console.log(activeItem.id)
     let displayStatus = "";
     if (activeItem.status === 0) {
       displayStatus = "Completed";
@@ -46,9 +68,9 @@ function DetailsModal({ activeItem, modalComments, toggleDetails, onClose }) {
                 <Form.Control placeholder= { displayStatus } disabled />
             </Form.Group>
             <b>Comments section</b>
-            { modalComments ? (
-              <CommentsTable comments = { modalComments } />
-            ) : " No comments attached" }
+            { loadingScreen ? (
+              <LoopIcon />
+            ) : <CommentsTable comments = { currentComments } /> }
           </Modal.Body>
           <Modal.Footer>
             <Button variant="primary" onClick={toggleDetails}>
@@ -58,5 +80,5 @@ function DetailsModal({ activeItem, modalComments, toggleDetails, onClose }) {
         </Modal>
     );
   }
-  
+
 export default DetailsModal

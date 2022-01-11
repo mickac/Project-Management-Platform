@@ -1,12 +1,14 @@
 import React, { Component, useState } from "react";
 import { Button, Modal, Form } from 'react-bootstrap'
 
+
 function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
   const [currentItem, setCurrentItem] = useState(activeItem) //useForm - na przyszłość
   const [isEditConfirm, setIsEditConfirm] = useState(false)
   const toggleEditConfirm = () => {
     setIsEditConfirm(current => !current)
   }
+
 
   let displayStatus = "";
   if (activeItem.status === 0) {

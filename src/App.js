@@ -82,6 +82,7 @@ class App extends Component {
       toggleComment: false,
       onClose: false,
       projectList: [],
+      commentsList: [],
       createModal: false,
       editModal: false,
       detailsModal: false,
@@ -96,12 +97,12 @@ class App extends Component {
       },
       activeComments: {
         id: 1,
-        user_id: 1,
-        project_id: 3,
-        first_name: "Michal",
-        last_name: "Kaczynski",
-        content: "Hello",    
-        added: "7/30/2017 8:26:40 AM",    
+        user_id: 0,
+        project_id: 0,
+        first_name: "test",
+        last_name: "",
+        content: "",    
+        added: "",    
       },
     };
   }
@@ -119,7 +120,6 @@ class App extends Component {
 
   handleEdit = (item) => {
     this.editToggle();
-    console.log(item)
     if (item.id) {
       axios
         .put(`/api/projects/${item.id}/`, item)
@@ -180,18 +180,6 @@ class App extends Component {
 
   deleteItem = (item) => {
     this.setState({ activeItem: item, deleteModal: !this.state.deleteModal });
-  };
-
-  handleChange = (e) => {
-    let { name,  value } = e.target;
-  
-    if (e.target.type === "checkbox") {
-      value = e.target.checked;
-    }
-  
-    const activeItem = { ...activeItem, [name]:  value };
-  
-    this.setState({ activeItem });
   };
 
   displayStatus = (statusCheck) => {
@@ -257,17 +245,10 @@ class App extends Component {
       return "New"
     }
   }
- /*
-                   <DropdownButton id="dropdown-basic-button" title="More options">
-                    <Dropdown.Item onClick={() => this.editItem(item)}>Edit Project</Dropdown.Item>
-                    <Dropdown.Item href="#/action-2">Add Comment</Dropdown.Item>
-                    <Dropdown.Item onClick={() => this.detailsItem(item)}>Details</Dropdown.Item>
-                    <Dropdown.Item href="#/action-3">Delete Project</Dropdown.Item>
-                  </DropdownButton>
- */
+
   renderItems = () => {
     const newItems = this.state.projectList.filter(
-      (item) => item.status === this.state.status
+      (item) => item.status === this.state.status //TODO
     );
 
     return (
@@ -361,7 +342,7 @@ class App extends Component {
         { this.state.detailsModal ? (
           <DetailsModal
             activeItem = { this.state.activeItem }
-            modalComments = { this.state.activeComments } //TODO KOMENTARZE
+  //          modalComments = { this.state.activeComments }
             toggleDetails = { this.detailsToggle }
             onClose = { () => { this.setState({ show:false }) } }
           />

@@ -9,7 +9,7 @@ const columns = [
         type: 'datetime',
         flex: 5,
     },    
-    {
+/*    {
         field: 'fullName',
         headerName: 'Full name',
         sortable: false,
@@ -18,7 +18,13 @@ const columns = [
             `${params.getValue(params.id, 'first_name') || ''} ${
             params.getValue(params.id, 'last_name') || ''
             }`,
-    },
+    }, */
+    {
+      field: 'user_id',
+      headerName: 'Full name',
+      sortable: false,
+      flex: 3,
+  },
     {
         field: 'content',
         headerName: 'Comments',
@@ -29,12 +35,12 @@ const columns = [
 
 ];
 
-function DataTable(comments) {
-  const commentSection = Object.values(comments)
+function DataTable({comments}) {
+
   return (
     <div style={{ height: 400, width: '100%' }}>
       <DataGrid
-        rows={commentSection}
+        rows={comments}
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5]}

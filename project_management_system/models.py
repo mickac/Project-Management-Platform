@@ -31,7 +31,7 @@ class Comments(models.Model):
     user_id = models.ForeignKey(Profile, on_delete=models.CASCADE)
     project_id = models.OneToOneField(Project, on_delete=models.CASCADE, primary_key=False)
     content = models.CharField(max_length=500)
-    added = models.DateTimeField()
+    added = models.DateTimeField(auto_now_add=True, blank=True)
 
 
 class ProjectOwnership(models.Model):
