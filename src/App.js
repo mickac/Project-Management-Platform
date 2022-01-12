@@ -135,6 +135,13 @@ class App extends Component {
       .then((res) => this.refreshList());
   };
 
+  handleComment = (item) => {
+    this.commentToggle();
+    axios
+      .post("/api/comments/", item)
+      .then((res) => this.refreshList());
+  };
+
   handleDelete = (item) => {
     this.deleteToggle()
     axios
@@ -248,7 +255,7 @@ class App extends Component {
 
   renderItems = () => {
     const newItems = this.state.projectList.filter(
-      (item) => item.status === this.state.status //TODO
+      (item) => item.status === this.state.status
     );
 
     return (
@@ -342,7 +349,6 @@ class App extends Component {
         { this.state.detailsModal ? (
           <DetailsModal
             activeItem = { this.state.activeItem }
-  //          modalComments = { this.state.activeComments }
             toggleDetails = { this.detailsToggle }
             onClose = { () => { this.setState({ show:false }) } }
           />
@@ -352,6 +358,7 @@ class App extends Component {
             activeItem = { this.state.activeItem }
             toggleComment = { this.commentToggle }
             onClose = { () => { this.setState({ show:false }) } }
+            onSave = { this.handleComment }
           />
         ) : null}
         { this.state.deleteModal ? (

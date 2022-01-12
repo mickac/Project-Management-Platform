@@ -9,7 +9,6 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
     setIsEditConfirm(current => !current)
   }
 
-
   let displayStatus = "";
   if (activeItem.status === 0) {
     displayStatus = "Completed";

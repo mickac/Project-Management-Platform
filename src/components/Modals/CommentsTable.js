@@ -39,12 +39,14 @@ function DataTable({comments}) {
 
   return (
     <div style={{ height: 400, width: '100%' }}>
+      { comments ? (
       <DataGrid
         rows={comments}
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5]}
-      />
+      />) : "No comments attached"
+    }
     </div>
   );
 }

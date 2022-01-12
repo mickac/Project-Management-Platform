@@ -5,13 +5,12 @@ import CommentsTable from './CommentsTable'
 import LoopIcon from '@mui/icons-material/Loop';
 
 function DetailsModal({ activeItem, toggleDetails, onClose }) {
-    
     const [currentComments ,setCurrentComments] = useState([])
     const [loadingScreen, setLoadingScreen] = useState(true)
     useEffect(() => {
       let isCancelled = false;
       axios
-        .get(`/api/comments/${activeItem.id}/`, activeItem)
+        .get(`/api/comments/?project_id=${activeItem.id}`, activeItem)
         .then((res) => setCurrentComments( Object.values(res.data) ))
         .then(() => {
           if (!isCancelled){
@@ -24,6 +23,7 @@ function DetailsModal({ activeItem, toggleDetails, onClose }) {
           isCancelled = true;
         }
     }, []);
+    
     console.log(activeItem.id)
     let displayStatus = "";
     if (activeItem.status === 0) {
