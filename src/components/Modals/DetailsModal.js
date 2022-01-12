@@ -24,7 +24,6 @@ function DetailsModal({ activeItem, toggleDetails, onClose }) {
         }
     }, []);
     
-    console.log(activeItem.id)
     let displayStatus = "";
     if (activeItem.status === 0) {
       displayStatus = "Completed";

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
+import Stack from '@mui/material/Stack';
 
 
 const columns = [
@@ -36,17 +37,24 @@ const columns = [
 ];
 
 function DataTable({comments}) {
-
+  let isEmpty = false
+  if (comments.length > 0){
+    isEmpty = true
+  }
   return (
     <div style={{ height: 400, width: '100%' }}>
-      { comments ? (
       <DataGrid
         rows={comments}
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5]}
-      />) : "No comments attached"
-    }
+        components={{
+          NoRowsOverlay: () => (
+            <Stack height="100%" alignItems="center" justifyContent="center">
+              No comments attached to this project
+            </Stack>
+          )}}
+      />
     </div>
   );
 }
