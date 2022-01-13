@@ -83,10 +83,6 @@ class App extends Component {
       onClose: false,
       projectList: [],
       commentsList: [],
-      createModal: false,
-      editModal: false,
-      detailsModal: false,
-      deleteModal: false,
       commentModal: false,
       activeItem: {
         title: "",
@@ -132,14 +128,15 @@ class App extends Component {
     this.createToggle();
     axios
       .post("/api/projects/", item)
-      .then((res) => this.refreshList());
+      .then((res) => this.refreshList())
   };
 
   handleComment = (item) => {
     this.commentToggle();
     axios
       .post("/api/comments/", item)
-      .then((res) => this.refreshList());
+      .then(() => setTimeout(() => 10000))
+      .then(this.detailsToggle());
   };
 
   handleDelete = (item) => {
