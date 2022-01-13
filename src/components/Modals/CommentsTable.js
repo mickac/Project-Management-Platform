@@ -37,10 +37,6 @@ const columns = [
 ];
 
 function DataTable({comments}) {
-  let isEmpty = false
-  if (comments.length > 0){
-    isEmpty = true
-  }
   return (
     <div style={{ height: 400, width: '100%' }}>
       <DataGrid
