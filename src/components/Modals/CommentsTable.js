@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
+import Stack from '@mui/material/Stack';
 
 
 const columns = [
@@ -9,7 +10,7 @@ const columns = [
         type: 'datetime',
         flex: 5,
     },    
-    {
+/*    {
         field: 'fullName',
         headerName: 'Full name',
         sortable: false,
@@ -18,7 +19,13 @@ const columns = [
             `${params.getValue(params.id, 'first_name') || ''} ${
             params.getValue(params.id, 'last_name') || ''
             }`,
-    },
+    }, */
+    {
+      field: 'user_id',
+      headerName: 'Full name',
+      sortable: false,
+      flex: 3,
+  },
     {
         field: 'content',
         headerName: 'Comments',
@@ -29,15 +36,20 @@ const columns = [
 
 ];
 
-function DataTable(comments) {
-  const commentSection = Object.values(comments)
+function DataTable({comments}) {
   return (
     <div style={{ height: 400, width: '100%' }}>
       <DataGrid
-        rows={commentSection}
+        rows={comments}
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5]}
+        components={{
+          NoRowsOverlay: () => (
+            <Stack height="100%" alignItems="center" justifyContent="center">
+              No comments attached to this project
+            </Stack>
+          )}}
       />
     </div>
   );

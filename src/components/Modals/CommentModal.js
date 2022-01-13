@@ -1,12 +1,13 @@
-import React, { Component, useState } from "react";
+import React, { useState } from "react";
 import { Button, Modal, Form } from 'react-bootstrap'
 
-function CommentModal({ activeItem, toggleComment, onClose }) {
+function CommentModal({ activeItem, toggleComment, onClose, onSave }) {
+  const [currentItem, setCurrentItem] = useState({project_id: activeItem.id, user_id: 1})
   const [isCommentConfirm, setIsConfirm] = useState(false)
   const toggleCommentConfirm = () => {
     setIsConfirm(current => !current)
   }
-
+//  setCurrentItem({...currentItem, project_id: activeItem.id})
   return (
       <Modal
         show={ toggleComment }
@@ -30,6 +31,7 @@ function CommentModal({ activeItem, toggleComment, onClose }) {
               name="comment"
               placeholder = "Add comment"
               disabled = { isCommentConfirm ? "disabled" : ""}  
+              onChange = {(e) => setCurrentItem({...currentItem, content: e.target.value})}
             />
           </Form.Group>
           { isCommentConfirm ? "Check comment field before sending, then press Send button." : ""}  
@@ -47,7 +49,7 @@ function CommentModal({ activeItem, toggleComment, onClose }) {
           </Button>
         )}  
         { isCommentConfirm ? (      
-          <Button variant="success" onClick={toggleComment}>
+          <Button variant="success" onClick={() => onSave(currentItem)}>
             Send
           </Button>
           ) 

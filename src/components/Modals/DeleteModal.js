@@ -1,29 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button, Modal, Form} from 'react-bootstrap'
-import axios from 'axios';
-import CommentsTable from './CommentsTable'
-import LoopIcon from '@mui/icons-material/Loop';
 
-function DetailsModal({ activeItem, toggleDetails, onClose }) {
-    const [currentComments ,setCurrentComments] = useState([])
-    const [loadingScreen, setLoadingScreen] = useState(true)
-    useEffect(() => {
-      let isCancelled = false;
-      axios
-        .get(`/api/comments/?project_id=${activeItem.id}`, activeItem)
-        .then((res) => setCurrentComments( Object.values(res.data) ))
-        .then(() => {
-          if (!isCancelled){
-            setLoadingScreen(false);
-          }
-        })
-        .catch((err) => console.log(err));     
-        
-        return () => {
-          isCancelled = true;
-        }
-    }, []);
-    
+function DeleteModal({ activeItem, toggleDelete, onClose, deleteItem }) {
+    const [isDeleteConfirm, setIsDeleteConfirm] = useState(false)
+    const toggleDeleteConfirm = () => {
+      setIsDeleteConfirm(current => !current)
+    }
+  
     let displayStatus = "";
     if (activeItem.status === 0) {
       displayStatus = "Completed";
@@ -37,13 +20,13 @@ function DetailsModal({ activeItem, toggleDetails, onClose }) {
 
     return (
         <Modal
-          show={ toggleDetails }
+          show={ toggleDelete }
           onHide={ onClose }
           backdrop="static"
           keyboard={ false }
         >
           <Modal.Header>
-            <Modal.Title>Project details</Modal.Title>
+            <Modal.Title>Project delete</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form.Group className="mb-3">
@@ -66,18 +49,35 @@ function DetailsModal({ activeItem, toggleDetails, onClose }) {
                 <Form.Label><b>Status</b></Form.Label>
                 <Form.Control placeholder= { displayStatus } disabled />
             </Form.Group>
-            <b>Comments section</b>
-            { loadingScreen ? (
-              <LoopIcon />
-            ) : <CommentsTable comments = { currentComments } /> }
+            { isDeleteConfirm ? "Apply delete of this project by pressing Apply Delete." : ""}
           </Modal.Body>
-          <Modal.Footer>
-            <Button variant="primary" onClick={toggleDetails}>
-              Close
+          <Modal.Footer>{ isDeleteConfirm ? 
+            (
+            <Button variant="warning" onClick={toggleDeleteConfirm}>
+                Cancel
             </Button>
+            )
+            :
+            (
+            <Button variant="danger" onClick={toggleDelete}>
+                Close
+            </Button>
+            )}  
+            { isDeleteConfirm ? (      
+            <Button variant="success" onClick={() => deleteItem(activeItem)}>
+                Apply Delete
+            </Button>
+            ) 
+            : 
+            (
+            <Button variant="primary" onClick={toggleDeleteConfirm}>
+                Delete
+            </Button>
+            )
+            }
           </Modal.Footer>
         </Modal>
     );
   }
-
-export default DetailsModal
+  
+export default DeleteModal
