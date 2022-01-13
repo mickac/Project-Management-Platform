@@ -18,10 +18,11 @@ import EditModal from "./components/Modals/EditModal";
 import DetailsModal from "./components/Modals/DetailsModal";
 import CreateModal from "./components/Modals/CreateModal";
 import CommentModal from "./components/Modals/CommentModal";
+import DeleteModal from "./components/Modals/DeleteModal";
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-
+/*
 const projectItems = [
   { 
     id: 1,
@@ -67,7 +68,7 @@ const comments = [
     content: "Hello",
   }
 ]
-
+*/
 class App extends Component {
   constructor(props) {
     super(props);
@@ -80,10 +81,12 @@ class App extends Component {
       toggleDetails: false,
       toggleComment: false,
       onClose: false,
-      projectList: projectItems,
+      projectList: [],
+      commentsList: [],
       createModal: false,
       editModal: false,
       detailsModal: false,
+      deleteModal: false,
       commentModal: false,
       activeItem: {
         title: "",
@@ -94,16 +97,58 @@ class App extends Component {
       },
       activeComments: {
         id: 1,
-        user_id: 1,
-        project_id: 3,
-        first_name: "Michal",
-        last_name: "Kaczynski",
-        content: "Hello",    
-        added: "7/30/2017 8:26:40 AM",    
+        user_id: 0,
+        project_id: 0,
+        first_name: "test",
+        last_name: "",
+        content: "",    
+        added: "",    
       },
     };
   }
-  
+
+  componentDidMount() {
+    this.refreshList();
+  }
+
+  refreshList = () => {
+    axios
+      .get("/api/projects/")
+      .then((res) => this.setState({ projectList: res.data }))
+      .catch((err) => console.log(err));
+  };
+
+  handleEdit = (item) => {
+    this.editToggle();
+    if (item.id) {
+      axios
+        .put(`/api/projects/${item.id}/`, item)
+        .then((res) => this.refreshList());
+      return;
+    }
+  };
+
+  handleCreate = (item) => {
+    this.createToggle();
+    axios
+      .post("/api/projects/", item)
+      .then((res) => this.refreshList());
+  };
+
+  handleComment = (item) => {
+    this.commentToggle();
+    axios
+      .post("/api/comments/", item)
+      .then((res) => this.refreshList());
+  };
+
+  handleDelete = (item) => {
+    this.deleteToggle()
+    axios
+      .delete(`/api/projects/${item.id}/`)
+      .then((res) => this.refreshList());
+  };
+
   createToggle = () => {
     this.setState({ createModal: !this.state.createModal });
   }
@@ -120,15 +165,13 @@ class App extends Component {
     this.setState({ commentModal: !this.state.commentModal });
   };
 
-  handleSubmit = (item) => {
-    this.toggle();
-
-    alert("save" + JSON.stringify(item));
+  deleteToggle = () => {
+    this.setState({ deleteModal: !this.state.deleteModal });
   };
 
   createItem = () => {
     this.setState({ createModal: !this.state.createModal });    
-  }
+  };
 
   editItem = (item) => {
     this.setState({ activeItem: item, editModal: !this.state.editModal });
@@ -142,16 +185,8 @@ class App extends Component {
     this.setState({ activeItem: item, commentModal: !this.state.commentModal });
   };
 
-  handleChange = (e) => {
-    let { name,  value } = e.target;
-  
-    if (e.target.type === "checkbox") {
-      value = e.target.checked;
-    }
-  
-    const activeItem = { ...activeItem, [name]:  value };
-  
-    this.setState({ activeItem });
+  deleteItem = (item) => {
+    this.setState({ activeItem: item, deleteModal: !this.state.deleteModal });
   };
 
   displayStatus = (statusCheck) => {
@@ -217,14 +252,7 @@ class App extends Component {
       return "New"
     }
   }
- /*
-                   <DropdownButton id="dropdown-basic-button" title="More options">
-                    <Dropdown.Item onClick={() => this.editItem(item)}>Edit Project</Dropdown.Item>
-                    <Dropdown.Item href="#/action-2">Add Comment</Dropdown.Item>
-                    <Dropdown.Item onClick={() => this.detailsItem(item)}>Details</Dropdown.Item>
-                    <Dropdown.Item href="#/action-3">Delete Project</Dropdown.Item>
-                  </DropdownButton>
- */
+
   renderItems = () => {
     const newItems = this.state.projectList.filter(
       (item) => item.status === this.state.status
@@ -265,7 +293,7 @@ class App extends Component {
                   <ListIcon onClick={() => this.detailsItem(item)} />
                 </Tooltip>
                 <Tooltip title="Delete project">
-                  <DeleteForeverIcon href="#/action-3" />
+                  <DeleteForeverIcon onClick={() => this.deleteItem(item)} />
                 </Tooltip>
                 </TableCell>
               </TableRow>
@@ -305,7 +333,7 @@ class App extends Component {
         { this.state.createModal ? (
           <CreateModal
             toggleCreate = { this.createToggle }
-            onSave = { this.handleSubmit }
+            onSave = { this.handleCreate }
             onClose = { () => { this.setState({ show:false }) } }
           />
         ) : null}
@@ -313,7 +341,7 @@ class App extends Component {
           <EditModal
             activeItem = { this.state.activeItem }
             toggleEdit = { this.editToggle }
-            onSave = { this.handleSubmit }
+            onSave = { this.handleEdit }
             onClose = { () => { this.setState({ show:false }) } }
             handleChange = { () => {this.handleChange(this.state.activeItem)}}
           />
@@ -321,7 +349,6 @@ class App extends Component {
         { this.state.detailsModal ? (
           <DetailsModal
             activeItem = { this.state.activeItem }
-            modalComments = { this.state.activeComments } //TODO KOMENTARZE
             toggleDetails = { this.detailsToggle }
             onClose = { () => { this.setState({ show:false }) } }
           />
@@ -330,6 +357,15 @@ class App extends Component {
           <CommentModal
             activeItem = { this.state.activeItem }
             toggleComment = { this.commentToggle }
+            onClose = { () => { this.setState({ show:false }) } }
+            onSave = { this.handleComment }
+          />
+        ) : null}
+        { this.state.deleteModal ? (
+          <DeleteModal
+            activeItem = { this.state.activeItem }
+            toggleDelete = { this.deleteToggle }
+            deleteItem = { this.handleDelete }
             onClose = { () => { this.setState({ show:false }) } }
           />
         ) : null}
