@@ -42,25 +42,26 @@ class App extends Component {
       commentModal: false,
       displayed_form: '',
       logged_in: localStorage.getItem('token') ? true : false,
+      userId: '',
       username: '',
       firstName: '',
       lastName: '',
       email: '',
       activeItem: {
-        title: "",
-        details: "",
-        start_date: "",
-        end_date: "",
-        status: "",
+        title: '',
+        details: '',
+        start_date: '',
+        end_date: '',
+        status: '',
       },
       activeComments: {
-        id: 1,
-        user_id: 0,
-        project_id: 0,
-        first_name: "test",
-        last_name: "",
-        content: "",    
-        added: "",    
+        id: '',
+        user_id: '',
+        project_id: '',
+        first_name: '',
+        last_name: '',
+        content: '',    
+        added: '',    
       },
     };
   }
@@ -75,6 +76,7 @@ class App extends Component {
         })
           .then((response) => {
             this.setState({ 
+              userId: response.data.id,
               username: response.data.username,
               firstName: response.data.first_name,
               lastName: response.data.last_name,
@@ -108,6 +110,7 @@ class App extends Component {
         this.setState({
           logged_in: true,
           displayed_form: '',
+          userId: response.data.id,
           username: response.data.user.username,
           firstName: response.data.user.first_name,
           lastName: response.data.user.last_name,
@@ -394,6 +397,7 @@ class App extends Component {
         { this.state.detailsModal ? (
           <DetailsModal
             activeItem = { this.state.activeItem }
+            userId = { this.state.userId }
             toggleDetails = { this.detailsToggle }
             onClose = { () => { this.setState({ show:false }) } }
           />
@@ -401,6 +405,7 @@ class App extends Component {
         { this.state.commentModal ? (
           <CommentModal
             activeItem = { this.state.activeItem }
+            userId = { this.state.userId }
             toggleComment = { this.commentToggle }
             onClose = { () => { this.setState({ show:false }) } }
             onSave = { this.handleComment }

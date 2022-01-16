@@ -8,6 +8,7 @@ from project_management_system import views
 router = routers.DefaultRouter()
 router.register(r'projects', views.ProjectView, 'project')
 router.register(r'comments', views.CommentsView, 'comment')
+router.register(r'userlist', views.UserView, 'userlist')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

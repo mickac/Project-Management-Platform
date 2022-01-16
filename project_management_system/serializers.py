@@ -9,17 +9,27 @@ class ProjectSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'details', 'start_date', 'end_date', 'status', 'added')
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'first_name', 'last_name', 'email')
+
+
 class CommentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comments
-        fields = ('id', 'user_id', 'project_id', 'content', 'added')
-        
+        fields = '__all__'
 
-class UserSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ('username', 'first_name', 'last_name', 'email')
+    def to_representation(self, obj):
+        return {
+            'id': obj.id, 
+            'user_id': obj.user_id.id, 
+            'project_id': obj.project_id.id, 
+            'content': obj.content, 
+            'added': obj.added,
+            'first_name': obj.user_id.first_name,
+            'last_name': obj.user_id.last_name,
+        }       
 
 
 class UserSerializerWithToken(serializers.ModelSerializer):

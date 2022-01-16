@@ -4,7 +4,7 @@ import axios from 'axios';
 import CommentsTable from './CommentsTable'
 import LoopIcon from '@mui/icons-material/Loop';
 
-function DetailsModal({ activeItem, toggleDetails, onClose }) {
+function DetailsModal({ activeItem, toggleDetails, onClose, userId }) {
     const [currentComments ,setCurrentComments] = useState([])
     const [loadingScreen, setLoadingScreen] = useState(true)
     useEffect(() => {
@@ -69,7 +69,10 @@ function DetailsModal({ activeItem, toggleDetails, onClose }) {
             <b>Comments section</b>
             { loadingScreen ? (
               <LoopIcon />
-            ) : <CommentsTable comments = { currentComments } /> }
+            ) : <CommentsTable 
+                  comments = { currentComments } 
+                  userId = { userId }
+                  /> }
           </Modal.Body>
           <Modal.Footer>
             <Button variant="primary" onClick={toggleDetails}>

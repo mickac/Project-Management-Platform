@@ -15,9 +15,15 @@ class ProjectView(viewsets.ModelViewSet):
 
 class CommentsView(viewsets.ModelViewSet):
     serializer_class = CommentsSerializer
-    queryset = Comments.objects.all()
+    queryset = Comments.objects.all().order_by('added').select_related('user_id')
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['user_id','project_id']
+
+
+class UserView(viewsets.ModelViewSet):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+
 
 def update_profile(request, user_id):
     user = User.objects.get(pk=user_id)

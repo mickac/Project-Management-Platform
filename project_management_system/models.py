@@ -28,7 +28,7 @@ class Profile(models.Model):
 
 
 class Comments(models.Model):
-    user_id = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     project_id = models.ForeignKey(Project, on_delete=models.CASCADE)
     content = models.CharField(max_length=500)
     added = models.DateTimeField(auto_now_add=True, blank=True)

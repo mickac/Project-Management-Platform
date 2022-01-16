@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Button, Modal, Form } from 'react-bootstrap'
 
-function CommentModal({ activeItem, toggleComment, onClose, onSave }) {
-  const [currentItem, setCurrentItem] = useState({project_id: activeItem.id, user_id: 1})
+function CommentModal({ activeItem, toggleComment, onClose, onSave, userId }) {
+  const [currentItem, setCurrentItem] = useState({project_id: activeItem.id, user_id: userId})
   const [isCommentConfirm, setIsConfirm] = useState(false)
   const toggleCommentConfirm = () => {
     setIsConfirm(current => !current)
