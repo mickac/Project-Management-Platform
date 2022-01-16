@@ -19,56 +19,12 @@ import DetailsModal from "./components/Modals/DetailsModal";
 import CreateModal from "./components/Modals/CreateModal";
 import CommentModal from "./components/Modals/CommentModal";
 import DeleteModal from "./components/Modals/DeleteModal";
+import LoginForm from './components/LoginForm';
+import SignupForm from './components/SignupForm';
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-/*
-const projectItems = [
-  { 
-    id: 1,
-    title: "test",
-    details: "test",
-    start_date: "2022-01-02",
-    end_date: "2022-01-09",
-    status: 2,
-  },
-  { 
-    id: 2,
-    title: "test1",
-    details: "test",
-    start_date: "2022-01-02",
-    end_date: "2022-01-09",
-    status: 0,
-  },
-  { 
-    id: 3,
-    title: "test2",
-    details: "test",
-    start_date: "2022-01-02",
-    end_date: "2022-01-09",
-    status: 1,
-  },
-  { 
-    id: 4,
-    title: "test3",
-    details: "test",
-    start_date: "2022-01-02",
-    end_date: "2022-01-09",
-    status: 2,
-  },
-]
 
-const comments = [
-  {
-    id: 1,
-    user_id: 1,
-    project_id: 3,
-    first_name: "Michal",
-    last_name: "Kaczynski",
-    content: "Hello",
-  }
-]
-*/
 class App extends Component {
   constructor(props) {
     super(props);
@@ -84,6 +40,12 @@ class App extends Component {
       projectList: [],
       commentsList: [],
       commentModal: false,
+      displayed_form: '',
+      logged_in: localStorage.getItem('token') ? true : false,
+      username: '',
+      firstName: '',
+      lastName: '',
+      email: '',
       activeItem: {
         title: "",
         details: "",
@@ -104,7 +66,23 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.refreshList();
+    if (this.state.logged_in) {
+      axios
+        .get('/api/pms/current_user/', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+          .then((response) => {
+            this.setState({ 
+              username: response.data.username,
+              firstName: response.data.first_name,
+              lastName: response.data.last_name,
+              email: response.data.email
+             });
+          })
+          .then(() => this.refreshList());
+    }
   }
 
   refreshList = () => {
@@ -114,12 +92,69 @@ class App extends Component {
       .catch((err) => console.log(err));
   };
 
+  handle_login = (e, data) => {
+    e.preventDefault();
+    const options = {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      username: data.username,
+      password: data.password
+    };
+    axios
+      .post('/api/token-auth/', options)
+      .then((response) => {
+        localStorage.setItem('token', response.token);
+        this.setState({
+          logged_in: true,
+          displayed_form: '',
+          username: response.data.user.username,
+          firstName: response.data.user.first_name,
+          lastName: response.data.user.last_name,
+          email: response.data.user.email
+        })
+      })
+      .then(() => this.refreshList());
+  };
+
+  handle_logout = () => {
+    localStorage.removeItem('token');
+    this.setState({ logged_in: false, username: '' });
+  };
+
+  display_form = form => {
+    this.setState({
+      displayed_form: form
+    });
+  };
+
+  handle_signup = (e, data) => {
+    e.preventDefault();
+    axios
+      .post('/api/pms/users/', {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        username: data.username,
+        password: data.password
+      })
+      .then((response) => {
+        this.setState({ 
+          username: response.data.username,
+          firstName: response.data.first_name,
+          lastName: response.data.last_name,
+          email: response.data.email
+         });
+      })
+      .then(() => this.refreshList());
+  };
+
   handleEdit = (item) => {
     this.editToggle();
     if (item.id) {
       axios
         .put(`/api/projects/${item.id}/`, item)
-        .then((res) => this.refreshList());
+        .then(() => this.refreshList());
       return;
     }
   };
@@ -128,7 +163,7 @@ class App extends Component {
     this.createToggle();
     axios
       .post("/api/projects/", item)
-      .then((res) => this.refreshList())
+      .then(() => this.refreshList())
   };
 
   handleComment = (item) => {
@@ -143,7 +178,7 @@ class App extends Component {
     this.deleteToggle()
     axios
       .delete(`/api/projects/${item.id}/`)
-      .then((res) => this.refreshList());
+      .then(() => this.refreshList());
   };
 
   createToggle = () => {
@@ -303,15 +338,23 @@ class App extends Component {
   };
 
   render() {
+
     return (
       <main className="container">
         <h1 className="text-center my-4">Project Management Platform</h1>
+        {this.state.logged_in ? (
         <div className="row">
           <div className="col-md-10 col-sm-10 mx-auto p-0">
             <div className="card p-3">
               <div className="mb-4">
                 <div className="float-right">
-                  Logged as first-name last-name (email) | Logout
+                  Logged as {this.state.firstName} {this.state.lastName} ({this.state.email}) | 
+                  <span
+                    className="logout"
+                    onClick={() => this.handle_logout()}
+                  >
+                    Logout
+                  </span>
                 </div>
                 <button
                   className="btn btn-primary"
@@ -327,6 +370,11 @@ class App extends Component {
             </div>
           </div>
         </div>
+        ):(
+          <LoginForm 
+            handle_login={this.handle_login} 
+          />
+        )}
         { this.state.createModal ? (
           <CreateModal
             toggleCreate = { this.createToggle }
