@@ -19,6 +19,7 @@ import DetailsModal from "./components/Modals/DetailsModal";
 import CreateModal from "./components/Modals/CreateModal";
 import CommentModal from "./components/Modals/CommentModal";
 import DeleteModal from "./components/Modals/DeleteModal";
+import EditUserModal from "./components/Modals/EditUserModal";
 import LoginForm from './components/LoginForm';
 import SignupForm from './components/SignupForm';
 
@@ -29,23 +30,19 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      viewCompleted: false,
-      viewInProgress: false,
-      viewNew: false,
-      toggleCreate: false,
-      toggleEdit: false,
-      toggleDetails: false,
-      toggleComment: false,
-      onClose: false,
       projectList: [],
       commentsList: [],
-      commentModal: false,
       displayed_form: '',
       logged_in: localStorage.getItem('token') ? true : false,
-      userId: '',
-      firstName: '',
-      lastName: '',
-      email: '',
+      user: {
+        id: '',
+        first_name: '',
+        last_name: '',
+        email: '',
+        gender: '',
+        phone_number: '',
+        birth_date: '',
+      },
       activeItem: {
         title: '',
         details: '',
@@ -88,11 +85,9 @@ class App extends Component {
       })
         .then((response) => {
           this.setState({ 
-            userId: response.data.id,
-            firstName: response.data.first_name,
-            lastName: response.data.last_name,
-            email: response.data.email
+            user: response.data
           });
+          console.log(this.state.user)
         })
   }
 
@@ -159,6 +154,16 @@ class App extends Component {
     }
   };
 
+  handleEdit = (user) => {
+    this.editToggle();
+    if (user.id) {
+      axios
+        .put(`/api/projects/${user.id}/`, user)
+        .then(() => this.refreshList()); //TODO REST API
+      return;
+    }
+  };
+
   handleCreate = (item) => {
     this.createToggle();
     axios
@@ -201,6 +206,10 @@ class App extends Component {
     this.setState({ deleteModal: !this.state.deleteModal });
   };
 
+  editUserToggle = () => {
+    this.setState({ editUserModal: !this.state.editUserModal });
+  };
+  
   createItem = () => {
     this.setState({ createModal: !this.state.createModal });    
   };
@@ -219,6 +228,11 @@ class App extends Component {
 
   deleteItem = (item) => {
     this.setState({ activeItem: item, deleteModal: !this.state.deleteModal });
+  };
+
+  editUser = () => {
+    this.setState({ editUserModal: !this.state.editUserModal });
+    console.log(this.state.editUserModal)
   };
 
   displayStatus = (statusCheck) => {
@@ -348,8 +362,14 @@ class App extends Component {
             <div className="card p-3">
               <div className="mb-4">
                 <div className="text-center">
-                   Logged as {this.state.firstName} {this.state.lastName} ({this.state.email})
+                   Logged as {this.state.user.first_name} {this.state.user.last_name} ({this.state.user.email})
                   <div className="float-right">
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => this.editUser()}
+                    >
+                      Change user details
+                    </button>
                     <button
                       className="btn btn-primary"
                       onClick={() => this.handle_logout()}
@@ -398,7 +418,7 @@ class App extends Component {
         { this.state.detailsModal ? (
           <DetailsModal
             activeItem = { this.state.activeItem }
-            userId = { this.state.userId }
+            userId = { this.state.user.id }
             toggleDetails = { this.detailsToggle }
             onClose = { () => { this.setState({ show:false }) } }
           />
@@ -406,7 +426,7 @@ class App extends Component {
         { this.state.commentModal ? (
           <CommentModal
             activeItem = { this.state.activeItem }
-            userId = { this.state.userId }
+            userId = { this.state.user.id }
             toggleComment = { this.commentToggle }
             onClose = { () => { this.setState({ show:false }) } }
             onSave = { this.handleComment }
@@ -417,6 +437,14 @@ class App extends Component {
             activeItem = { this.state.activeItem }
             toggleDelete = { this.deleteToggle }
             deleteItem = { this.handleDelete }
+            onClose = { () => { this.setState({ show:false }) } }
+          />
+        ) : null}
+        { this.state.editUserModal ? (
+          <EditUserModal
+            user = { this.state.user }
+            toggleEditUser = { this.editUserToggle }
+            onSave = { this.handleEditUser }
             onClose = { () => { this.setState({ show:false }) } }
           />
         ) : null}
