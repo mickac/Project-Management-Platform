@@ -1,48 +1,138 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useEffect } from "react";
+import { Button, Modal, Form } from 'react-bootstrap'
 
-class SignupForm extends React.Component {
-  state = {
-    username: '',
-    password: ''
-  };
-
-  handle_change = e => {
-    const name = e.target.name;
-    const value = e.target.value;
-    this.setState(prevstate => {
-      const newState = { ...prevstate };
-      newState[name] = value;
-      return newState;
-    });
-  };
-
-  render() {
-    return (
-      <form onSubmit={e => this.props.handle_signup(e, this.state)}>
-        <h4>Sign Up</h4>
-        <label htmlFor="username">Username</label>
-        <input
-          type="text"
-          name="username"
-          value={this.state.username}
-          onChange={this.handle_change}
-        />
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          name="password"
-          value={this.state.password}
-          onChange={this.handle_change}
-        />
-        <input type="submit" />
-      </form>
-    );
+function SignupForm({ toggleCreate, onClose, onSave }) {
+  const [currentUser, setCurrentUser] = useState()
+  const [isSignupConfirm, setIsSignupConfirm] = useState(false)
+  const toggleSignupConfirm = () => {
+    setIsSignupConfirm(current => !current)
   }
+  console.log(currentUser)
+  return (
+      <Modal
+        show={ toggleCreate }
+        onHide={ onClose }
+        backdrop="static"
+        keyboard={ false }
+      >
+        <Modal.Header>
+          <Modal.Title>Create new user</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group className="mb-3">
+            <Form.Label>E-mail</Form.Label>
+            <Form.Control
+              type = "text"
+              id = "user-email"
+              name = "email"
+              placeholder = "Provide e-mail (this will be your login)"
+              disabled = { isSignupConfirm ? "disabled" : ""}  
+              onChange = {(e) => setCurrentUser({...currentUser, email: e.target.value})}
+              required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>First name</Form.Label>
+            <Form.Control
+              type = "text"
+              id = "user-first-name"
+              name = "first_name"
+              placeholder = "Provide first name"
+              disabled = { isSignupConfirm ? "disabled" : ""}  
+              onChange = {(e) => setCurrentUser({...currentUser, first_name: e.target.value})}
+              required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Last name</Form.Label>
+            <Form.Control
+              type = "text"
+              id = "user-last-name"
+              name = "last_name"
+              placeholder = "Provide last name"
+              disabled = { isSignupConfirm ? "disabled" : ""}  
+              onChange = {(e) => setCurrentUser({...currentUser, last_name: e.target.value})}
+              required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type="password"
+              id="user-password"
+              name="password"
+              placeholder = "Enter password"
+              disabled = { isSignupConfirm ? "disabled" : ""}  
+              onChange = {(e) => setCurrentUser({...currentUser, password: e.target.value})}
+              required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Birth date</Form.Label>
+            <Form.Control
+              type="date"
+              id="user-birthdate"
+              name="birth_date"
+              disabled = { isSignupConfirm ? "disabled" : ""}  
+              onChange = {(e) => setCurrentUser({...currentUser, birth_date: e.target.value})}
+              required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Gender</Form.Label>
+              <Form.Control as = "select"
+                id="user-gender"
+                name="gender"
+                disabled = { isSignupConfirm ? "disabled" : ""}  
+                onChange = {(e) => setCurrentUser({...currentUser, gender:e.target.value})}
+                required
+              >
+              <option>Select gender</option>
+              <option value='Male'>Male</option>
+              <option value='Female'>Female</option>
+              <option value='Unknown'>Unknown</option>
+              </Form.Control>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Phone number</Form.Label>
+            <Form.Control
+              type = "text"
+              id = "user-phone"
+              name = "phone_number"
+              placeholder = "Provide phone number (not required)"
+              disabled = { isSignupConfirm ? "disabled" : ""}  
+              onChange = {(e) => setCurrentUser({...currentUser, phone_number: e.target.value})}
+            />
+          </Form.Group>
+          { isSignupConfirm ? "Note: Check all fields and accept by pressing Create user" : ""}  
+        </Modal.Body>
+        <Modal.Footer>{ isSignupConfirm ? 
+        (
+          <Button variant="warning" onClick={toggleSignupConfirm}>
+            Cancel
+          </Button>
+        )
+        :
+        (
+          <Button variant="danger" onClick={toggleCreate}>
+            Close
+          </Button>
+        )}  
+        { isSignupConfirm ? (      
+          <Button variant="success" type="submit" onClick={() => onSave(currentUser)}>
+            CreateUser
+          </Button>
+          ) 
+          : 
+          (
+          <Button variant="primary" onClick={toggleSignupConfirm}>
+            Sumbit
+          </Button>
+          )
+        }
+        </Modal.Footer>
+      </Modal>
+  );
 }
-
-export default SignupForm;
-
-SignupForm.propTypes = {
-  handle_signup: PropTypes.func.isRequired
-};
+  
+export default SignupForm

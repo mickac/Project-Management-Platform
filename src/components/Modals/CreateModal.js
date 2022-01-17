@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import { Button, Modal, Form } from 'react-bootstrap'
-//import SelectForm from './SelectForm'
 import Select from 'react-select';
 
 function CreateModal({ toggleCreate, onClose, onSave, userId, userFirstName, userLastName }) {

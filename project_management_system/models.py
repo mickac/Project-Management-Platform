@@ -9,7 +9,7 @@ from project_management_system.managers import CustomUserManager
 GEDNDER_CHOICES = [
     ('Male', 'Male'),
     ('Female', 'Female'),
-    ('Not specified', 'Not specified'),
+    ('Unknown', 'Unknown'),
 ]
 
 class User(AbstractUser):

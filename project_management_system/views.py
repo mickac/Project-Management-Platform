@@ -1,7 +1,7 @@
-from django.shortcuts import render
 from .models import Project, Comments, ProjectOwnership
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, generics
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -33,16 +33,6 @@ class OwnershipView(viewsets.ModelViewSet):
     filterset_fields = ['user_id','project_id']
 
 
-@api_view(['GET'])
-def current_user(request):
-    """
-    Determine the current user by their token, and return their data
-    """
-    
-    serializer = UserSerializer(request.user)
-    return Response(serializer.data)
-
-
 class UserList(APIView):
     """
     Create a new user. It's called 'UserList' because normally we'd have a get
@@ -57,3 +47,19 @@ class UserList(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserCreateAPIView(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (AllowAny,)
+
+
+@api_view(['GET'])
+def current_user(request):
+    """
+    Determine the current user by their token, and return their data
+    """
+    
+    serializer = UserSerializer(request.user)
+    return Response(serializer.data)

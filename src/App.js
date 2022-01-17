@@ -394,7 +394,7 @@ class App extends Component {
                       onClick={() => this.editUser()}
                     >
                       Change user details
-                    </button>
+                    </button>{' '}
                     <button
                       className="btn btn-primary"
                       onClick={() => this.handle_logout()}
