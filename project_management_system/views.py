@@ -55,6 +55,11 @@ class UserCreateAPIView(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
 
 
+class UserUpdateAPIView(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
 @api_view(['GET'])
 def current_user(request):
     """

@@ -3,12 +3,12 @@ import { Button, Modal, Form } from 'react-bootstrap'
 
 
 function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
-    console.log('dupa')
   const [currentUser, setCurrentUser] = useState(user)
   const [isEditUserConfirm, setIsEditUserConfirm] = useState(false)
   const toggleEditConfirm = () => {
     setIsEditUserConfirm(current => !current)
   }
+  console.log(currentUser)
   return (
       <Modal
         show={ toggleEditUser }
@@ -31,6 +31,15 @@ function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
             />
           </Form.Group>
           <Form.Group className="mb-3">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type = "password"
+              id = "user-password"
+              name = "password"
+              onChange = {(e) => setCurrentUser({...currentUser, password: e.target.value})}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
             <Form.Label>First name</Form.Label>
             <Form.Control
               type="text"
@@ -38,7 +47,7 @@ function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
               name="first-name"
               defaultValue = { user.first_name }
               disabled = { isEditUserConfirm ? "disabled" : ""}  
-              onChange = {(e) => setCurrentUser({...currentUser, details: e.target.value})}
+              onChange = {(e) => setCurrentUser({...currentUser, first_name: e.target.value})}
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -49,7 +58,7 @@ function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
               name="last-name"
               defaultValue = { user.last_name }
               disabled = { isEditUserConfirm ? "disabled" : ""}  
-              onChange = {(e) => setCurrentUser({...currentUser, start_date: e.target.value})}
+              onChange = {(e) => setCurrentUser({...currentUser, last_name: e.target.value})}
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -59,9 +68,8 @@ function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
               id="user-birthDate"
               name="birth-date"
               defaultValue = { user.birth_date }
-              defaultValue = { user.gender }
               disabled = { isEditUserConfirm ? "disabled" : ""}  
-              onChange = {(e) => setCurrentUser({...currentUser, end_date: e.target.value})}
+              onChange = {(e) => setCurrentUser({...currentUser, birth_date: e.target.value})}
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -70,7 +78,7 @@ function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
                 id="user-gender"
                 name="gender"
                 disabled = { isEditUserConfirm ? "disabled" : ""}  
-                onChange = {(e) => setCurrentUser({...currentUser, status:e.target.value})}
+                onChange = {(e) => setCurrentUser({...currentUser, gender:e.target.value})}
               >
               <option value='Male'>Male</option>
               <option value='Female'>Female</option>
@@ -85,7 +93,7 @@ function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
               name="phone-number"
               defaultValue = { user.phone_number }
               disabled = { isEditUserConfirm ? "disabled" : ""}  
-              onChange = {(e) => setCurrentUser({...currentUser, start_date: e.target.value})}
+              onChange = {(e) => setCurrentUser({...currentUser, phone_number: e.target.value})}
             />
           </Form.Group>
           { isEditUserConfirm ? "Please check all fields and confirm editing by pressing Apply Changes." : ""}  

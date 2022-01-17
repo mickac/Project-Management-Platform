@@ -9,17 +9,6 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
     setIsEditConfirm(current => !current)
   }
 
-  let displayStatus = "";
-  if (activeItem.status === 0) {
-    displayStatus = "Completed";
-  }
-  if (activeItem.status === 1) {
-    displayStatus = "In progress";
-  }
-  if (activeItem.status === 2) {
-    displayStatus = "New";
-  }
-
   return (
       <Modal
         show={ toggleEdit }

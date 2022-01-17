@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-//import ProjectTable from './components/ProjectTable'
-import { DropdownButton, Dropdown } from 'react-bootstrap'
 import axios from 'axios';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -21,7 +19,6 @@ import CommentModal from "./components/Modals/CommentModal";
 import DeleteModal from "./components/Modals/DeleteModal";
 import EditUserModal from "./components/Modals/EditUserModal";
 import LoginForm from './components/LoginForm';
-import SignupForm from './components/SignupForm';
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
@@ -32,7 +29,6 @@ class App extends Component {
     this.state = {
       projectList: [],
       commentsList: [],
-      displayed_form: '',
       logged_in: localStorage.getItem('token') ? true : false,
       user: {
         id: '',
@@ -105,7 +101,6 @@ class App extends Component {
         localStorage.setItem('token', response.data.access);
         this.setState({
           logged_in: true,
-          displayed_form: '',
         })
       })
       .then(() => this.refreshList());
@@ -117,33 +112,6 @@ class App extends Component {
       logged_in: false, 
       user: {}
     });
-  };
-
-  display_form = form => {
-    this.setState({
-      displayed_form: form
-    });
-  };
-
-  handle_signup = (e, data) => {
-    e.preventDefault();
-    axios
-      .post('/api/pms/users/', {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        email: data.email,
-        password: data.password
-      })
-      .then((response) => {
-        this.setState({ 
-          userId: response.data.id,
-          firstName: response.data.first_name,
-          lastName: response.data.last_name,
-          email: response.data.email
-         });
-      })
-      .then(() => this.refreshList());
   };
 
   handleEdit = (item) => {
@@ -160,7 +128,7 @@ class App extends Component {
     this.editUserToggle();
     if (user.id) {
       axios
-        .put(`/api/userlist/${user.id}/`, user)
+        .put(`/api/update/${user.id}/`, user)
         .then(() => this.getInfo()); //TODO REST API
       return;
     }

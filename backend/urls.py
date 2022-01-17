@@ -14,6 +14,7 @@ router.register(r'comments', views.CommentsView, 'comment')
 router.register(r'userlist', views.UserView, 'userlist')
 router.register(r'ownership', views.OwnershipView, 'ownership')
 router.register(r'register', views.UserCreateAPIView, 'register')
+router.register(r'update', views.UserUpdateAPIView, 'update')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

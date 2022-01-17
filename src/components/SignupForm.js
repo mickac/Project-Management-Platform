@@ -28,7 +28,6 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
               placeholder = "Provide e-mail (this will be your login)"
               disabled = { isSignupConfirm ? "disabled" : ""}  
               onChange = {(e) => setCurrentUser({...currentUser, email: e.target.value})}
-              required
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -40,7 +39,6 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
               placeholder = "Provide first name"
               disabled = { isSignupConfirm ? "disabled" : ""}  
               onChange = {(e) => setCurrentUser({...currentUser, first_name: e.target.value})}
-              required
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -52,7 +50,6 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
               placeholder = "Provide last name"
               disabled = { isSignupConfirm ? "disabled" : ""}  
               onChange = {(e) => setCurrentUser({...currentUser, last_name: e.target.value})}
-              required
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -64,7 +61,6 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
               placeholder = "Enter password"
               disabled = { isSignupConfirm ? "disabled" : ""}  
               onChange = {(e) => setCurrentUser({...currentUser, password: e.target.value})}
-              required
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -75,7 +71,6 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
               name="birth_date"
               disabled = { isSignupConfirm ? "disabled" : ""}  
               onChange = {(e) => setCurrentUser({...currentUser, birth_date: e.target.value})}
-              required
             />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -85,7 +80,6 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
                 name="gender"
                 disabled = { isSignupConfirm ? "disabled" : ""}  
                 onChange = {(e) => setCurrentUser({...currentUser, gender:e.target.value})}
-                required
               >
               <option>Select gender</option>
               <option value='Male'>Male</option>
