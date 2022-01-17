@@ -34,7 +34,6 @@ function DetailsModal({ activeItem, toggleDetails, onClose, userId }) {
             (user) => user.is_owner === true
           )
         )
-        .then(console.log('dupa'))
         return () => {
           isCancelled = true;
         }

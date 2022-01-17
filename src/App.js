@@ -87,7 +87,6 @@ class App extends Component {
           this.setState({ 
             user: response.data
           });
-          console.log(this.state.user)
         })
   }
 
@@ -167,12 +166,35 @@ class App extends Component {
     }
   };
 
-  handleCreate = (item) => {
+  handleCreate = (item, ownership) => {
     this.createToggle();
     axios
       .post("/api/projects/", item)
+      .then((response) => this.ownershipUpdate(response.data.id, ownership))
       .then(() => this.refreshList())
   };
+
+  ownershipUpdate = (id, ownership) => {
+    console.log(id)
+    const project_id = id
+    axios
+      .post(`/api/ownership/`,
+      {
+        user_id: this.state.user.id,
+        project_id: project_id,
+        is_owner: true
+      })
+    ownership.map((item) => (
+      axios
+        .post(`/api/ownership/`,
+        {
+          user_id: item.value,
+          project_id: project_id,
+          is_owner: false
+        })
+    ))
+
+  }
 
   handleComment = (item) => {
     this.commentToggle();
@@ -404,6 +426,9 @@ class App extends Component {
         )}
         { this.state.createModal ? (
           <CreateModal
+            userId = { this.state.user.id }
+            userFirstName = { this.state.user.first_name }
+            userLastName = { this.state.user.last_name }
             toggleCreate = { this.createToggle }
             onSave = { this.handleCreate }
             onClose = { () => { this.setState({ show:false }) } }

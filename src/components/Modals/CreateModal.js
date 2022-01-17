@@ -1,13 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from 'axios';
 import { Button, Modal, Form } from 'react-bootstrap'
+//import SelectForm from './SelectForm'
+import Select from 'react-select';
 
-function CreateModal({ toggleCreate, onClose, onSave }) {
+function CreateModal({ toggleCreate, onClose, onSave, userId, userFirstName, userLastName }) {
   const [currentItem, setCurrentItem] = useState()
+  const [currentOwnership, setCurrentOwnership] = useState([])
   const [isCreateConfirm, setIsConfirm] = useState(false)
+  const [currentMultiValue, setCurrentMultiValue] = useState([])
+  const notOwner = currentOwnership.filter(
+    (item) => item.id !== userId
+  )
+  const userList = notOwner.map(({id, first_name, last_name}) => ({
+      label: first_name + " " + last_name,
+      value: id
+  }))
   const toggleCreateConfirm = () => {
     setIsConfirm(current => !current)
   }
-
+  useEffect(() => {
+    axios
+      .get(`/api/userlist/`)
+      .then((res) => setCurrentOwnership( Object.values(res.data) ))
+      .catch((err) => console.log(err));     
+  }, []);
   return (
       <Modal
         show={ toggleCreate }
@@ -61,6 +78,17 @@ function CreateModal({ toggleCreate, onClose, onSave }) {
               onChange = {(e) => setCurrentItem({...currentItem, end_date: e.target.value})}
             />
           </Form.Group>
+          Users in project
+          <Select
+            isMulti
+            name="colors"
+            options={userList}
+            className="basic-multi-select"
+            classNamePrefix="select"
+            defaultValue={currentMultiValue}
+            onChange={setCurrentMultiValue}
+            isDisabled = { isCreateConfirm ? "disabled" : ""} 
+          />
           { isCreateConfirm ? "Note: Status of the new project will be set on 'New'. Please check all fields and confirm by pressing Apply Creation." : ""}  
         </Modal.Body>
         <Modal.Footer>{ isCreateConfirm ? 
@@ -76,7 +104,7 @@ function CreateModal({ toggleCreate, onClose, onSave }) {
           </Button>
         )}  
         { isCreateConfirm ? (      
-          <Button variant="success" type="submit" onClick={() => onSave(currentItem)}>
+          <Button variant="success" type="submit" onClick={() => onSave(currentItem, currentMultiValue)}>
             Apply creation
           </Button>
           ) 
