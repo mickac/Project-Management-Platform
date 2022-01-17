@@ -3,9 +3,17 @@ import { Button, Modal, Form} from 'react-bootstrap'
 import axios from 'axios';
 import CommentsTable from './CommentsTable'
 import LoopIcon from '@mui/icons-material/Loop';
+import InsetList from './InsetList'
 
 function DetailsModal({ activeItem, toggleDetails, onClose, userId }) {
+    let owner = [{
+      user_id: '',
+      project_id: '',
+      is_owner: false,
+      full_name: '',
+    }]
     const [currentComments ,setCurrentComments] = useState([])
+    const [currentOwnership ,setCurrentOwnership] = useState([])
     const [loadingScreen, setLoadingScreen] = useState(true)
     useEffect(() => {
       let isCancelled = false;
@@ -18,11 +26,22 @@ function DetailsModal({ activeItem, toggleDetails, onClose, userId }) {
           }
         })
         .catch((err) => console.log(err));     
-        
+      axios
+        .get(`/api/ownership/?project_id=${activeItem.id}`, activeItem)
+        .then((res) => setCurrentOwnership( Object.values(res.data) ))
+        .then(() => 
+          owner = currentOwnership.filter(
+            (user) => user.is_owner === true
+          )
+        )
+        .then(console.log('dupa'))
         return () => {
           isCancelled = true;
         }
     }, []);
+    console.log(owner[0].full_name)
+    console.log(currentOwnership)
+
     
     let displayStatus = "";
     if (activeItem.status === 0) {
@@ -45,7 +64,7 @@ function DetailsModal({ activeItem, toggleDetails, onClose, userId }) {
           <Modal.Header>
             <Modal.Title>Project details</Modal.Title>
           </Modal.Header>
-          <Modal.Body>
+          <Modal.Body>    
             <Form.Group className="mb-3">
                 <Form.Label><b>Project title</b></Form.Label>
                 <Form.Control placeholder= { activeItem.title } disabled />
@@ -66,6 +85,8 @@ function DetailsModal({ activeItem, toggleDetails, onClose, userId }) {
                 <Form.Label><b>Status</b></Form.Label>
                 <Form.Control placeholder= { displayStatus } disabled />
             </Form.Group>
+            <b>Users added to project</b>
+            <InsetList users = { currentOwnership } />
             <b>Comments section</b>
             { loadingScreen ? (
               <LoopIcon />

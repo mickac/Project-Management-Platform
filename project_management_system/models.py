@@ -52,5 +52,5 @@ class Comments(models.Model):
 
 class ProjectOwnership(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    project_id = models.OneToOneField(Project, on_delete=models.CASCADE, primary_key=False)
+    project_id = models.ForeignKey(Project, on_delete=models.CASCADE)
     is_owner = models.BooleanField()

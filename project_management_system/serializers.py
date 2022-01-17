@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.settings import api_settings
-from .models import Project, Comments, User
+from .models import Project, Comments, User, ProjectOwnership
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -30,6 +30,20 @@ class CommentsSerializer(serializers.ModelSerializer):
             'first_name': obj.user_id.first_name,
             'last_name': obj.user_id.last_name,
         }       
+
+
+class ProjectOwnershipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectOwnership
+        fields = '__all__'
+
+    def to_representation(self, obj):
+        return {
+            'user_id': obj.user_id.id, 
+            'project_id': obj.project_id.id, 
+            'is_owner': obj.is_owner,
+            'full_name': obj.user_id.first_name + ' ' + obj.user_id.last_name,
+        }     
 
 
 class UserSerializerWithToken(serializers.ModelSerializer):

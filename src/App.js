@@ -114,7 +114,10 @@ class App extends Component {
 
   handle_logout = () => {
     localStorage.removeItem('token');
-    this.setState({ logged_in: false, email: '' });
+    this.setState({ 
+      logged_in: false, 
+      user: {}
+    });
   };
 
   display_form = form => {
@@ -154,12 +157,12 @@ class App extends Component {
     }
   };
 
-  handleEdit = (user) => {
-    this.editToggle();
+  handleEditUser = (user) => {
+    this.editUserToggle();
     if (user.id) {
       axios
-        .put(`/api/projects/${user.id}/`, user)
-        .then(() => this.refreshList()); //TODO REST API
+        .put(`/api/userlist/${user.id}/`, user)
+        .then(() => this.getInfo()); //TODO REST API
       return;
     }
   };
