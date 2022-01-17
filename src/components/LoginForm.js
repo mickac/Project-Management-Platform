@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 class LoginForm extends React.Component {
   state = {
-    username: '',
+    email: '',
     password: ''
   };
 
@@ -30,16 +30,16 @@ class LoginForm extends React.Component {
                             <Form.Control
                             type = "text"
                             id = "user-email"
-                            name = "username"
+                            name = "email"
                             placeholder = "Enter your e-mail address" 
-                            value={this.state.username}
+                            value={this.state.email}
                             onChange = {this.handle_change}
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">
                         <Form.Label>Password</Form.Label>
                             <Form.Control
-                            type = "text"
+                            type = "password"
                             id = "user-password"
                             name = "password"
                             placeholder = "Enter your password" 

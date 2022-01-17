@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from rest_framework_jwt.settings import api_settings
+from rest_framework_simplejwt.settings import api_settings
 from .models import Project, Comments, User
 
 
@@ -55,4 +55,4 @@ class UserSerializerWithToken(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('token', 'username', 'password')
+        fields = ('token', 'email', 'password')

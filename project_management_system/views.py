@@ -1,12 +1,13 @@
 from django.shortcuts import render
-from .models import User, Project, Comments, Profile
+from .models import Project, Comments
 from rest_framework import viewsets, permissions, status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import ProjectSerializer, CommentsSerializer, UserSerializer, UserSerializerWithToken
-
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 class ProjectView(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
@@ -24,11 +25,6 @@ class UserView(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
-
-def update_profile(request, user_id):
-    user = User.objects.get(pk=user_id)
-    user.profile.bio = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit...'
-    user.save()
 
 @api_view(['GET'])
 def current_user(request):

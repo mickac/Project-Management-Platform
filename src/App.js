@@ -43,7 +43,6 @@ class App extends Component {
       displayed_form: '',
       logged_in: localStorage.getItem('token') ? true : false,
       userId: '',
-      username: '',
       firstName: '',
       lastName: '',
       email: '',
@@ -68,22 +67,7 @@ class App extends Component {
 
   componentDidMount() {
     if (this.state.logged_in) {
-      axios
-        .get('/api/pms/current_user/', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        })
-          .then((response) => {
-            this.setState({ 
-              userId: response.data.id,
-              username: response.data.username,
-              firstName: response.data.first_name,
-              lastName: response.data.last_name,
-              email: response.data.email
-             });
-          })
-          .then(() => this.refreshList());
+          this.refreshList();
     }
   }
 
@@ -91,8 +75,26 @@ class App extends Component {
     axios
       .get("/api/projects/")
       .then((res) => this.setState({ projectList: res.data }))
+      .then(() => this.getInfo())
       .catch((err) => console.log(err));
   };
+
+  getInfo = () => {
+    axios
+      .get('/api/pms/current_user/', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+        .then((response) => {
+          this.setState({ 
+            userId: response.data.id,
+            firstName: response.data.first_name,
+            lastName: response.data.last_name,
+            email: response.data.email
+          });
+        })
+  }
 
   handle_login = (e, data) => {
     e.preventDefault();
@@ -100,21 +102,16 @@ class App extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      username: data.username,
+      email: data.email,
       password: data.password
     };
     axios
-      .post('/api/token-auth/', options)
+      .post('/api/token/', options)
       .then((response) => {
-        localStorage.setItem('token', response.token);
+        localStorage.setItem('token', response.data.access);
         this.setState({
           logged_in: true,
           displayed_form: '',
-          userId: response.data.id,
-          username: response.data.user.username,
-          firstName: response.data.user.first_name,
-          lastName: response.data.user.last_name,
-          email: response.data.user.email
         })
       })
       .then(() => this.refreshList());
@@ -122,7 +119,7 @@ class App extends Component {
 
   handle_logout = () => {
     localStorage.removeItem('token');
-    this.setState({ logged_in: false, username: '' });
+    this.setState({ logged_in: false, email: '' });
   };
 
   display_form = form => {
@@ -138,12 +135,12 @@ class App extends Component {
         headers: {
           'Content-Type': 'application/json'
         },
-        username: data.username,
+        email: data.email,
         password: data.password
       })
       .then((response) => {
         this.setState({ 
-          username: response.data.username,
+          userId: response.data.id,
           firstName: response.data.first_name,
           lastName: response.data.last_name,
           email: response.data.email
@@ -350,21 +347,25 @@ class App extends Component {
           <div className="col-md-10 col-sm-10 mx-auto p-0">
             <div className="card p-3">
               <div className="mb-4">
-                <div className="float-right">
-                  Logged as {this.state.firstName} {this.state.lastName} ({this.state.email}) | 
-                  <span
-                    className="logout"
-                    onClick={() => this.handle_logout()}
-                  >
-                    Logout
-                  </span>
+                <div className="text-center">
+                   Logged as {this.state.firstName} {this.state.lastName} ({this.state.email})
+                  <div className="float-right">
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => this.handle_logout()}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                  <div className="float-left">
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => this.createItem()}
+                    >
+                      Add Project
+                    </button>
+                  </div>
                 </div>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => this.createItem()}
-                >
-                  Add Project
-                </button>
               </div>
               { this.renderTabList() }
               <ul className="list-group list-group-flush border-top-0">

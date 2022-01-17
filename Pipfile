@@ -17,7 +17,7 @@ djangorestframework = "*"
 django-cors-headers = "*"
 whitenoise = "*"
 django-filter = "*"
-djangorestframework-jwt = "*"
+djangorestframework-simplejwt = "*"
 
 [requires]
 python_version = "3.7"
