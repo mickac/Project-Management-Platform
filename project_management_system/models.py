@@ -11,6 +11,14 @@ GEDNDER_CHOICES = [
     ('Female', 'Female'),
     ('Unknown', 'Unknown'),
 ]
+class Project(models.Model):
+    title = models.CharField(max_length=50)
+    details = models.CharField(max_length=500)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    status = models.IntegerField(default=2)
+    added = models.DateTimeField(auto_now_add=True, blank=True)
+
 
 class User(AbstractUser):
     username = None
@@ -26,6 +34,7 @@ class User(AbstractUser):
     )
     gender = models.TextField(max_length=15, choices=GEDNDER_CHOICES)
     birth_date = models.DateField()
+    projects = models.ManyToManyField(Project, through='ProjectOwnership')
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -33,14 +42,6 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
-
-class Project(models.Model):
-    title = models.CharField(max_length=50)
-    details = models.CharField(max_length=500)
-    start_date = models.DateField()
-    end_date = models.DateField()
-    status = models.IntegerField(default=2)
-    added = models.DateTimeField(auto_now_add=True, blank=True)
 
 
 class Comments(models.Model):

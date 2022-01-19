@@ -9,7 +9,7 @@ from rest_framework_simplejwt.views import (
 from project_management_system import views
 
 router = routers.DefaultRouter()
-router.register(r'projects', views.ProjectView, 'project')
+#router.register(r'projects', views.ProjectView, 'project')
 router.register(r'comments', views.CommentsView, 'comment')
 router.register(r'userlist', views.UserView, 'userlist')
 router.register(r'ownership', views.OwnershipView, 'ownership')

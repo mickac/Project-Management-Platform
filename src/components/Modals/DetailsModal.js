@@ -5,20 +5,21 @@ import CommentsTable from './CommentsTable'
 import LoopIcon from '@mui/icons-material/Loop';
 import InsetList from './InsetList'
 
-function DetailsModal({ activeItem, toggleDetails, onClose, userId }) {
+function DetailsModal({ activeItem, toggleDetails, onClose, userId, comments }) {
     let owner = [{
       user_id: '',
       project_id: '',
       is_owner: false,
       full_name: '',
     }]
-    const [currentComments ,setCurrentComments] = useState([])
+    const [currentComments ,setCurrentComments] = useState([comments])
     const [currentOwnership ,setCurrentOwnership] = useState([])
     const [loadingScreen, setLoadingScreen] = useState(true)
     useEffect(() => {
       let isCancelled = false;
       axios
         .get(`/api/comments/?project_id=${activeItem.id}`, activeItem)
+        .catch(() => alert("Something went wrong."))
         .then((res) => setCurrentComments( Object.values(res.data) ))
         .then(() => {
           if (!isCancelled){
@@ -28,6 +29,7 @@ function DetailsModal({ activeItem, toggleDetails, onClose, userId }) {
         .catch((err) => console.log(err));     
       axios
         .get(`/api/ownership/?project_id=${activeItem.id}`, activeItem)
+        .catch(() => alert("Something went wrong."))
         .then((res) => setCurrentOwnership( Object.values(res.data) ))
         .then(() => 
           owner = currentOwnership.filter(
@@ -38,9 +40,6 @@ function DetailsModal({ activeItem, toggleDetails, onClose, userId }) {
           isCancelled = true;
         }
     }, []);
-    console.log(owner[0].full_name)
-    console.log(currentOwnership)
-
     
     let displayStatus = "";
     if (activeItem.status === 0) {

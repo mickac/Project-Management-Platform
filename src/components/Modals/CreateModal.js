@@ -21,6 +21,7 @@ function CreateModal({ toggleCreate, onClose, onSave, userId, userFirstName, use
   useEffect(() => {
     axios
       .get(`/api/userlist/`)
+      .catch(() => alert("Something went wrong."))
       .then((res) => setCurrentOwnership( Object.values(res.data) ))
       .catch((err) => console.log(err));     
   }, []);

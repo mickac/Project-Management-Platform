@@ -22,7 +22,15 @@ import LoginForm from './components/LoginForm';
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-
+/*
+TODO
+Fix z haslem userowskim zmiana
+Testy API
+Refactoring
+Mieszkowski flex, automatyczne testy na github?
+Usuwanie ownership jak usuwam projekt
+PUT,DELETE METHODS
+*/
 class App extends Component {
   constructor(props) {
     super(props);
@@ -30,6 +38,11 @@ class App extends Component {
       projectList: [],
       commentsList: [],
       logged_in: localStorage.getItem('token') ? true : false,
+      userProjects: [{
+        user_id: '',
+        project_id: '',
+        is_owner: false,
+      }],
       user: {
         id: '',
         first_name: '',
@@ -60,16 +73,21 @@ class App extends Component {
 
   componentDidMount() {
     if (this.state.logged_in) {
-          this.refreshList();
+      this.getInfo()  
+    }
+    else {
+      this.handle_logout()
     }
   }
 
   refreshList = () => {
     axios
-      .get("/api/projects/")
+      .get(`/api/pms/projects/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
       .then((res) => this.setState({ projectList: res.data }))
-      .then(() => this.getInfo())
-      .catch((err) => console.log(err));
   };
 
   getInfo = () => {
@@ -79,11 +97,13 @@ class App extends Component {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       })
-        .then((response) => {
-          this.setState({ 
-            user: response.data
-          });
-        })
+      .catch(() => alert("Something went wrong."))
+      .then((response) => {
+        this.setState({ 
+          user: response.data
+        });
+      })
+      .then(() => this.refreshList()) 
   }
 
   handle_login = (e, data) => {
@@ -102,15 +122,18 @@ class App extends Component {
         this.setState({
           logged_in: true,
         })
+        this.getInfo()
+        this.refreshList()
       })
-      .then(() => this.refreshList());
+      .catch(() => alert("Invalid credentials."))
   };
 
   handle_logout = () => {
     localStorage.removeItem('token');
     this.setState({ 
       logged_in: false, 
-      user: {}
+      user: {},
+      projectList: []
     });
   };
 
@@ -118,7 +141,8 @@ class App extends Component {
     this.editToggle();
     if (item.id) {
       axios
-        .put(`/api/projects/${item.id}/`, item)
+        .put(`/api/pms/projects/${item.id}/`, item)
+        .catch(() => alert("Something went wrong."))
         .then(() => this.refreshList());
       return;
     }
@@ -129,7 +153,8 @@ class App extends Component {
     if (user.id) {
       axios
         .put(`/api/update/${user.id}/`, user)
-        .then(() => this.getInfo()); //TODO REST API
+        .catch(() => alert("Something went wrong."))
+        .then(() => this.getInfo());
       return;
     }
   };
@@ -137,7 +162,8 @@ class App extends Component {
   handleCreate = (item, ownership) => {
     this.createToggle();
     axios
-      .post("/api/projects/", item)
+      .post("/api/pms/projects/", item)
+      .catch(() => alert("Something went wrong."))
       .then((response) => this.ownershipUpdate(response.data.id, ownership))
       .then(() => this.refreshList())
   };
@@ -152,6 +178,7 @@ class App extends Component {
         project_id: project_id,
         is_owner: true
       })
+      .catch(() => alert("Something went wrong."))
     ownership.map((item) => (
       axios
         .post(`/api/ownership/`,
@@ -160,22 +187,24 @@ class App extends Component {
           project_id: project_id,
           is_owner: false
         })
+        .catch(() => alert("Something went wrong."))
     ))
 
   }
-
+  
   handleComment = (item) => {
     this.commentToggle();
     axios
       .post("/api/comments/", item)
-      .then(() => setTimeout(() => 10000))
-      .then(this.detailsToggle());
+      .catch(() => alert("Something went wrong."))
+      .then(() => this.detailsToggle());
   };
 
   handleDelete = (item) => {
     this.deleteToggle()
     axios
-      .delete(`/api/projects/${item.id}/`)
+      .delete(`/api/pms/projects/${item.id}/`)
+      .catch(() => alert("Something went wrong."))
       .then(() => this.refreshList());
   };
 
@@ -225,7 +254,6 @@ class App extends Component {
 
   editUser = () => {
     this.setState({ editUserModal: !this.state.editUserModal });
-    console.log(this.state.editUserModal)
   };
 
   displayStatus = (statusCheck) => {
@@ -293,10 +321,15 @@ class App extends Component {
   }
 
   renderItems = () => {
+/*    const preFilterItems = this.state.projectList.filter(
+        (item) => item.id === this.state.userProjects[i].project_id
+      )
+      console.log(preFilterItems)
+*/
     const newItems = this.state.projectList.filter(
-      (item) => item.status === this.state.status
+      (item) => item.status === this.state.status // && 
     );
-
+//    console.log(this.state.userProjects)
     return (
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} size="large" aria-label="a dense table">
@@ -415,6 +448,7 @@ class App extends Component {
           <DetailsModal
             activeItem = { this.state.activeItem }
             userId = { this.state.user.id }
+            comments = { this.state.comments }
             toggleDetails = { this.detailsToggle }
             onClose = { () => { this.setState({ show:false }) } }
           />

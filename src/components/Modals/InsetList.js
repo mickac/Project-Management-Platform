@@ -13,7 +13,7 @@ export default function InsetList({ users }) {
       aria-label="contacts"
     >
     {users.map((user) =>  (
-    <React.Fragment>
+    <React.Fragment key={user.user_id}>
       <ListItem disablePadding>
         <ListItemButton>
           <ListItemIcon>

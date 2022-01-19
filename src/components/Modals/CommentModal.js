@@ -7,7 +7,6 @@ function CommentModal({ activeItem, toggleComment, onClose, onSave, userId }) {
   const toggleCommentConfirm = () => {
     setIsConfirm(current => !current)
   }
-//  setCurrentItem({...currentItem, project_id: activeItem.id})
   return (
       <Modal
         show={ toggleComment }

@@ -28,7 +28,7 @@ class LoginForm extends React.Component {
     this.signupToggle();
     axios
       .post("/api/register/", user)
-    
+      .catch(() => alert("Something went wrong."))
   };
 
   render() {

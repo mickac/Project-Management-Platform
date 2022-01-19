@@ -19,7 +19,7 @@ const columns = [
     {
         field: 'added',
         headerName: 'Time added',
-        type: 'datetime',
+        type: 'dateTime',
         flex: 5,
     },    
     {

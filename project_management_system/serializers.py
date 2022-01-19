@@ -6,7 +6,7 @@ from .models import Project, Comments, User, ProjectOwnership
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ('id', 'title', 'details', 'start_date', 'end_date', 'status', 'added')
+        fields = '__all__'
 
 
 class UserSerializer(serializers.ModelSerializer):

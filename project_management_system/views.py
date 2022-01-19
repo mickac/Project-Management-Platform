@@ -1,7 +1,7 @@
 from .models import Project, Comments, ProjectOwnership
 from rest_framework import viewsets, permissions, status, generics
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,10 +9,28 @@ from .serializers import ProjectSerializer, CommentsSerializer, UserSerializer, 
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-class ProjectView(viewsets.ModelViewSet):
-    serializer_class = ProjectSerializer
-    queryset = Project.objects.all()
+class ProjectView(APIView):
+    permission_classes = (AllowAny,)
 
+    def get(self, request, format=None):
+        projects = Project.objects.filter(user=request.user) 
+        serializer = ProjectSerializer(projects, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
+
+    def post(self, request, format=None):
+        serializer = ProjectSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, format=None):
+        projects = Project.objects.filter(id=request.data['id']) 
+        serializer = ProjectSerializer(projects, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CommentsView(viewsets.ModelViewSet):
     serializer_class = CommentsSerializer
