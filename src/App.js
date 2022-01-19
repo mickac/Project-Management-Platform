@@ -1,154 +1,226 @@
 import React, { Component } from "react";
-//import ProjectTable from './components/ProjectTable'
-import { DropdownButton, Dropdown } from 'react-bootstrap'
-import axios from 'axios';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import Tooltip from '@mui/material/Tooltip';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import CreateIcon from '@mui/icons-material/Create';
-import AddCommentIcon from '@mui/icons-material/AddComment';
-import ListIcon from '@mui/icons-material/List';
+import axios from "axios";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import Tooltip from "@mui/material/Tooltip";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import CreateIcon from "@mui/icons-material/Create";
+import AddCommentIcon from "@mui/icons-material/AddComment";
+import ListIcon from "@mui/icons-material/List";
 import EditModal from "./components/Modals/EditModal";
 import DetailsModal from "./components/Modals/DetailsModal";
 import CreateModal from "./components/Modals/CreateModal";
 import CommentModal from "./components/Modals/CommentModal";
 import DeleteModal from "./components/Modals/DeleteModal";
+import EditUserModal from "./components/Modals/EditUserModal";
+import LoginForm from "./components/LoginForm";
 
-axios.defaults.xsrfCookieName = 'csrftoken'
-axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-/*
-const projectItems = [
-  { 
-    id: 1,
-    title: "test",
-    details: "test",
-    start_date: "2022-01-02",
-    end_date: "2022-01-09",
-    status: 2,
-  },
-  { 
-    id: 2,
-    title: "test1",
-    details: "test",
-    start_date: "2022-01-02",
-    end_date: "2022-01-09",
-    status: 0,
-  },
-  { 
-    id: 3,
-    title: "test2",
-    details: "test",
-    start_date: "2022-01-02",
-    end_date: "2022-01-09",
-    status: 1,
-  },
-  { 
-    id: 4,
-    title: "test3",
-    details: "test",
-    start_date: "2022-01-02",
-    end_date: "2022-01-09",
-    status: 2,
-  },
-]
+axios.defaults.xsrfCookieName = "csrftoken";
+axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
-const comments = [
-  {
-    id: 1,
-    user_id: 1,
-    project_id: 3,
-    first_name: "Michal",
-    last_name: "Kaczynski",
-    content: "Hello",
-  }
-]
-*/
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      viewCompleted: false,
-      viewInProgress: false,
-      viewNew: false,
-      toggleCreate: false,
-      toggleEdit: false,
-      toggleDetails: false,
-      toggleComment: false,
-      onClose: false,
       projectList: [],
       commentsList: [],
-      commentModal: false,
-      activeItem: {
-        title: "",
-        details: "",
-        start_date: "",
-        end_date: "",
-        status: "",
-      },
-      activeComments: {
-        id: 1,
-        user_id: 0,
-        project_id: 0,
-        first_name: "test",
-        last_name: "",
-        content: "",    
-        added: "",    
-      },
+      logged_in: localStorage.getItem("token") ? true : false,
+      userProjects: [{}],
+      user: {},
+      activeItem: {},
+      activeComments: {},
     };
   }
 
   componentDidMount() {
-    this.refreshList();
+    if (this.state.logged_in) {
+      this.getInfo();
+    } else {
+      this.handle_logout();
+    }
   }
 
   refreshList = () => {
     axios
-      .get("/api/projects/")
-      .then((res) => this.setState({ projectList: res.data }))
-      .catch((err) => console.log(err));
+      .get(`/api/pms/projects/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => this.setState({ projectList: res.data }));
+  };
+
+  getInfo = () => {
+    axios
+      .get("/api/pms/current_user/", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((response) => {
+        this.setState({
+          user: response.data,
+        });
+      })
+      .then(() => this.refreshList())
+      .catch(() => alert("Something went wrong."));
+  };
+
+  handle_login = (e, data) => {
+    e.preventDefault();
+    const options = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      email: data.email,
+      password: data.password,
+    };
+    axios
+      .post("/api/token/", options)
+      .then(({ data }) => {
+        localStorage.setItem("token", data.access);
+        this.setState({
+          logged_in: true,
+        });
+        this.getInfo();
+        this.refreshList();
+      })
+      .catch(() => alert("Invalid credentials."));
+  };
+
+  handle_logout = () => {
+    localStorage.removeItem("token");
+    this.setState({
+      logged_in: false,
+      user: {},
+      projectList: [],
+    });
   };
 
   handleEdit = (item) => {
-    this.editToggle();
-    if (item.id) {
-      axios
-        .put(`/api/projects/${item.id}/`, item)
-        .then((res) => this.refreshList());
-      return;
+    if (
+      item.title !== "" &&
+      item.details !== "" &&
+      item.start_date !== "" &&
+      item.end_date !== ""
+    ) {
+      this.editToggle();
+      if (item.id) {
+        axios
+          .put(`/api/pms/projects/${item.id}/`, item, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          })
+          .then(() => this.refreshList())
+          .catch(() => alert("Something went wrong."));
+      }
+    } else {
+      alert("Some of required fields are empty!");
     }
   };
 
-  handleCreate = (item) => {
+  handleEditUser = (user) => {
+    this.editUserToggle();
+    if (user.id) {
+      axios
+        .patch(`/api/userlist/${user.id}/`, user, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+        .then(() => this.getInfo())
+        .catch(() => alert("Something went wrong."));
+    }
+  };
+
+  handleCreate = (item, ownership) => {
     this.createToggle();
     axios
-      .post("/api/projects/", item)
-      .then((res) => this.refreshList())
+      .post("/api/pms/projects/", item, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((response) => this.ownershipUpdate(response.data.id, ownership))
+      .then(() => this.refreshList())
+      .catch(() =>
+        alert("Something went wrong. Some of required files might be empty.")
+      );
+  };
+
+  ownershipUpdate = (id, ownership) => {
+    const project_id = id;
+    axios
+      .post(
+        `/api/ownership/`,
+        {
+          user_id: this.state.user.id,
+          project_id: project_id,
+          is_owner: true,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      )
+      .catch(() => alert("Something went wrong."));
+    ownership.map((item) =>
+      axios
+        .post(
+          `/api/ownership/`,
+          {
+            user_id: item.value,
+            project_id: project_id,
+            is_owner: false,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        )
+        .catch(() => alert("Something went wrong."))
+    );
   };
 
   handleComment = (item) => {
-    this.commentToggle();
-    axios
-      .post("/api/comments/", item)
-      .then(() => setTimeout(() => 10000))
-      .then(this.detailsToggle());
+    if (item.content !== undefined || item.content == "") {
+      this.commentToggle();
+      axios
+        .post("/api/comments/", item, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+        .then(() => this.detailsToggle())
+        .catch(() => alert("Something went wrong."));
+    } else {
+      alert("Comment field cannot be empty.");
+    }
   };
 
   handleDelete = (item) => {
-    this.deleteToggle()
+    this.deleteToggle();
     axios
-      .delete(`/api/projects/${item.id}/`)
-      .then((res) => this.refreshList());
+      .delete(`/api/pms/projects/${item.id}/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then(() => this.refreshList())
+      .catch(() => alert("Something went wrong."));
   };
 
   createToggle = () => {
     this.setState({ createModal: !this.state.createModal });
-  }
+  };
 
   editToggle = () => {
     this.setState({ editModal: !this.state.editModal });
@@ -166,8 +238,12 @@ class App extends Component {
     this.setState({ deleteModal: !this.state.deleteModal });
   };
 
+  editUserToggle = () => {
+    this.setState({ editUserModal: !this.state.editUserModal });
+  };
+
   createItem = () => {
-    this.setState({ createModal: !this.state.createModal });    
+    this.setState({ createModal: !this.state.createModal });
   };
 
   editItem = (item) => {
@@ -186,14 +262,18 @@ class App extends Component {
     this.setState({ activeItem: item, deleteModal: !this.state.deleteModal });
   };
 
+  editUser = () => {
+    this.setState({ editUserModal: !this.state.editUserModal });
+  };
+
   displayStatus = (statusCheck) => {
     if (statusCheck === 0) {
-      return this.setState({ 
+      return this.setState({
         viewCompleted: true,
         viewInProgress: false,
         viewNew: false,
         status: 0,
-       });
+      });
     }
     if (statusCheck === 1) {
       return this.setState({
@@ -201,15 +281,15 @@ class App extends Component {
         viewInProgress: true,
         viewNew: false,
         status: 1,
-       });
+      });
     }
-    if (statusCheck === 2){
+    if (statusCheck === 2) {
       return this.setState({
         viewCompleted: false,
         viewInProgress: false,
         viewNew: true,
         status: 2,
-       });
+      });
     }
   };
 
@@ -239,16 +319,16 @@ class App extends Component {
   };
 
   selectStatus = (status) => {
-    if (status === 0){
-      return "Completed"
+    if (status === 0) {
+      return "Completed";
     }
-    if (status === 1){
-      return "In progress"
+    if (status === 1) {
+      return "In progress";
     }
-    if (status === 2){
-      return "New"
+    if (status === 2) {
+      return "New";
     }
-  }
+  };
 
   renderItems = () => {
     const newItems = this.state.projectList.filter(
@@ -268,37 +348,38 @@ class App extends Component {
             </TableRow>
           </TableHead>
           <TableBody>
-            {newItems.map((item) =>  (
+            {newItems.map((item) => (
               <TableRow
-                key={ item.id }
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                key={item.id}
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
-                  { item.title }
+                  {item.title}
                 </TableCell>
-                <TableCell align="right">{ item.start_date }</TableCell>
-                <TableCell align="right">{ item.end_date }</TableCell>
-                <TableCell align="right">{ this.selectStatus(item.status) }</TableCell>
+                <TableCell align="right">{item.start_date}</TableCell>
+                <TableCell align="right">{item.end_date}</TableCell>
                 <TableCell align="right">
-                <Tooltip title="Edit project">
-                  <CreateIcon onClick={() => this.editItem(item)} />
-                </Tooltip>
-                <Tooltip title="Add comment">
-                  <AddCommentIcon onClick={() => this.commentItem(item)} />
-                </Tooltip>
-                <Tooltip title="View details">
-                  <ListIcon onClick={() => this.detailsItem(item)} />
-                </Tooltip>
-                <Tooltip title="Delete project">
-                  <DeleteForeverIcon onClick={() => this.deleteItem(item)} />
-                </Tooltip>
+                  {this.selectStatus(item.status)}
+                </TableCell>
+                <TableCell align="right">
+                  <Tooltip title="Edit project">
+                    <CreateIcon onClick={() => this.editItem(item)} />
+                  </Tooltip>
+                  <Tooltip title="Add comment">
+                    <AddCommentIcon onClick={() => this.commentItem(item)} />
+                  </Tooltip>
+                  <Tooltip title="View details">
+                    <ListIcon onClick={() => this.detailsItem(item)} />
+                  </Tooltip>
+                  <Tooltip title="Delete project">
+                    <DeleteForeverIcon onClick={() => this.deleteItem(item)} />
+                  </Tooltip>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-
     );
   };
 
@@ -306,64 +387,114 @@ class App extends Component {
     return (
       <main className="container">
         <h1 className="text-center my-4">Project Management Platform</h1>
-        <div className="row">
-          <div className="col-md-10 col-sm-10 mx-auto p-0">
-            <div className="card p-3">
-              <div className="mb-4">
-                <div className="float-right">
-                  Logged as first-name last-name (email) | Logout
+        {this.state.logged_in ? (
+          <div className="row">
+            <div className="col-md-10 col-sm-10 mx-auto p-0">
+              <div className="card p-3">
+                <div className="mb-4">
+                  <div className="text-center">
+                    Logged as {this.state.user.first_name}{" "}
+                    {this.state.user.last_name} ({this.state.user.email})
+                    <div className="float-right">
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => this.editUser()}
+                      >
+                        Change user details
+                      </button>{" "}
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => this.handle_logout()}
+                      >
+                        Logout
+                      </button>
+                    </div>
+                    <div className="float-left">
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => this.createItem()}
+                      >
+                        Add Project
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => this.createItem()}
-                >
-                  Add Project
-                </button>
+                {this.renderTabList()}
+                <ul className="list-group list-group-flush border-top-0">
+                  {this.renderItems()}
+                </ul>
               </div>
-              { this.renderTabList() }
-              <ul className="list-group list-group-flush border-top-0">
-                { this.renderItems() }
-              </ul>
             </div>
           </div>
-        </div>
-        { this.state.createModal ? (
+        ) : (
+          <LoginForm handle_login={this.handle_login} />
+        )}
+        {this.state.createModal ? (
           <CreateModal
-            toggleCreate = { this.createToggle }
-            onSave = { this.handleCreate }
-            onClose = { () => { this.setState({ show:false }) } }
+            userId={this.state.user.id}
+            userFirstName={this.state.user.first_name}
+            userLastName={this.state.user.last_name}
+            toggleCreate={this.createToggle}
+            onSave={this.handleCreate}
+            onClose={() => {
+              this.setState({ show: false });
+            }}
           />
         ) : null}
-        { this.state.editModal ? (
+        {this.state.editModal ? (
           <EditModal
-            activeItem = { this.state.activeItem }
-            toggleEdit = { this.editToggle }
-            onSave = { this.handleEdit }
-            onClose = { () => { this.setState({ show:false }) } }
-            handleChange = { () => {this.handleChange(this.state.activeItem)}}
+            activeItem={this.state.activeItem}
+            toggleEdit={this.editToggle}
+            onSave={this.handleEdit}
+            onClose={() => {
+              this.setState({ show: false });
+            }}
+            handleChange={() => {
+              this.handleChange(this.state.activeItem);
+            }}
           />
         ) : null}
-        { this.state.detailsModal ? (
+        {this.state.detailsModal ? (
           <DetailsModal
-            activeItem = { this.state.activeItem }
-            toggleDetails = { this.detailsToggle }
-            onClose = { () => { this.setState({ show:false }) } }
+            token={localStorage.getItem("token")}
+            activeItem={this.state.activeItem}
+            userId={this.state.user.id}
+            comments={this.state.comments}
+            toggleDetails={this.detailsToggle}
+            onClose={() => {
+              this.setState({ show: false });
+            }}
           />
         ) : null}
-        { this.state.commentModal ? (
+        {this.state.commentModal ? (
           <CommentModal
-            activeItem = { this.state.activeItem }
-            toggleComment = { this.commentToggle }
-            onClose = { () => { this.setState({ show:false }) } }
-            onSave = { this.handleComment }
+            activeItem={this.state.activeItem}
+            userId={this.state.user.id}
+            toggleComment={this.commentToggle}
+            onClose={() => {
+              this.setState({ show: false });
+            }}
+            onSave={this.handleComment}
           />
         ) : null}
-        { this.state.deleteModal ? (
+        {this.state.deleteModal ? (
           <DeleteModal
-            activeItem = { this.state.activeItem }
-            toggleDelete = { this.deleteToggle }
-            deleteItem = { this.handleDelete }
-            onClose = { () => { this.setState({ show:false }) } }
+            activeItem={this.state.activeItem}
+            toggleDelete={this.deleteToggle}
+            deleteItem={this.handleDelete}
+            onClose={() => {
+              this.setState({ show: false });
+            }}
+          />
+        ) : null}
+        {this.state.editUserModal ? (
+          <EditUserModal
+            user={this.state.user}
+            toggleEditUser={this.editUserToggle}
+            onSave={this.handleEditUser}
+            onClose={() => {
+              this.setState({ show: false });
+            }}
           />
         ) : null}
       </main>

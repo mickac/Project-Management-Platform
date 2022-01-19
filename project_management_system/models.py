@@ -1,12 +1,15 @@
+from typing_extensions import Required
 from django.db import models
-from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
+
+from project_management_system.managers import CustomUserManager
 
 GEDNDER_CHOICES = [
     ('Male', 'Male'),
     ('Female', 'Female'),
-    ('Not specified', 'Not specified'),
+    ('Unknown', 'Unknown'),
 ]
 
 
@@ -19,32 +22,39 @@ class Project(models.Model):
     added = models.DateTimeField(auto_now_add=True, blank=True)
 
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+class User(AbstractUser):
+    username = None
+    email = models.EmailField(_('email address'), unique=True)
+    phone_regex = RegexValidator(
+        regex=r'^\+?1?\d{9,15}$',
+        message="""Phone number must be entered in the format: 
+                        '+999999999'. 9-15 digits allowed.""",
+    )
+    phone_number = models.CharField(
+        validators=[phone_regex],
+        max_length=17,
+        blank=True
+    )
     gender = models.TextField(max_length=15, choices=GEDNDER_CHOICES)
-    birth_date = models.DateField(null=True, blank=True)
-    email = models.EmailField()
-    phone_number = models.CharField(max_length=14)
+    birth_date = models.DateField()
+    projects = models.ManyToManyField(Project, through='ProjectOwnership')
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return self.email
 
 
 class Comments(models.Model):
-    user_id = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     project_id = models.ForeignKey(Project, on_delete=models.CASCADE)
     content = models.CharField(max_length=500)
     added = models.DateTimeField(auto_now_add=True, blank=True)
 
 
 class ProjectOwnership(models.Model):
-    user_id = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    project_id = models.OneToOneField(Project, on_delete=models.CASCADE, primary_key=False)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    project_id = models.ForeignKey(Project, on_delete=models.CASCADE)
     is_owner = models.BooleanField()
-
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
