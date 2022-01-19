@@ -69,16 +69,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-
-#DATABASES = {}
-#DATABASES['default'] = dj_database_url.config(conn_max_age=600)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'mydatabase',
-    }
-}
-
+DATABASES = {}
+DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 AUTH_PASSWORD_VALIDATORS = [
     {
