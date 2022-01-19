@@ -138,7 +138,7 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
           </Button>
         ) : (
           <Button variant="primary" onClick={toggleSignupConfirm}>
-            Sumbit
+            Submit
           </Button>
         )}
       </Modal.Footer>
