@@ -5,15 +5,21 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import ProjectSerializer, CommentsSerializer, UserSerializer, UserSerializerWithToken, ProjectOwnershipSerializer
+from .serializers import (
+    ProjectSerializer,
+    CommentsSerializer,
+    UserSerializer,
+    UserSerializerWithToken,
+    ProjectOwnershipSerializer)
 from django.contrib.auth import get_user_model
 User = get_user_model()
+
 
 class ProjectView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        projects = Project.objects.filter(user=request.user) 
+        projects = Project.objects.filter(user=request.user)
         serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
@@ -38,11 +44,14 @@ class ProjectView(APIView):
         Comments.objects.filter(project_id=pk).delete()
         return Response(status.HTTP_200_OK)
 
+
 class CommentsView(viewsets.ModelViewSet):
     serializer_class = CommentsSerializer
-    queryset = Comments.objects.all().order_by('added').select_related('user_id')
+    queryset = (Comments.objects.all()
+                .order_by('added')
+                .select_related('user_id'))
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['user_id','project_id']
+    filterset_fields = ['user_id', 'project_id']
 
 
 class UserView(viewsets.ModelViewSet):
@@ -54,7 +63,7 @@ class OwnershipView(viewsets.ModelViewSet):
     serializer_class = ProjectOwnershipSerializer
     queryset = ProjectOwnership.objects.all()
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['user_id','project_id']
+    filterset_fields = ['user_id', 'project_id']
 
 
 class UserList(APIView):
@@ -80,6 +89,7 @@ class UserList(APIView):
             return Response(serializer.data, status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class UserCreateAPIView(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -89,11 +99,12 @@ class UserCreateAPIView(viewsets.ModelViewSet):
 class UserUpdateAPIView(viewsets.ModelViewSet):
     pass
 
+
 @api_view(['GET'])
 def current_user(request):
     """
     Determine the current user by their token, and return their data
     """
-    
+
     serializer = UserSerializer(request.user)
     return Response(serializer.data)

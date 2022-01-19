@@ -14,7 +14,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'email', 'password', 'gender', 'birth_date', 'phone_number')
+        fields = ('id', 'first_name', 'last_name', 'email', 
+        'password', 'gender', 'birth_date', 'phone_number')
 
     def create(self, validated_data):
         user = super(UserSerializer, self).create(validated_data)
@@ -39,14 +40,14 @@ class CommentsSerializer(serializers.ModelSerializer):
 
     def to_representation(self, obj):
         return {
-            'id': obj.id, 
-            'user_id': obj.user_id.id, 
-            'project_id': obj.project_id.id, 
-            'content': obj.content, 
+            'id': obj.id,
+            'user_id': obj.user_id.id,
+            'project_id': obj.project_id.id,
+            'content': obj.content,
             'added': obj.added,
             'first_name': obj.user_id.first_name,
             'last_name': obj.user_id.last_name,
-        }       
+        }
 
 
 class ProjectOwnershipSerializer(serializers.ModelSerializer):
@@ -56,11 +57,11 @@ class ProjectOwnershipSerializer(serializers.ModelSerializer):
 
     def to_representation(self, obj):
         return {
-            'user_id': obj.user_id.id, 
-            'project_id': obj.project_id.id, 
+            'user_id': obj.user_id.id,
+            'project_id': obj.project_id.id,
             'is_owner': obj.is_owner,
             'full_name': obj.user_id.first_name + ' ' + obj.user_id.last_name,
-        }     
+        }
 
 
 class UserSerializerWithToken(serializers.ModelSerializer):

@@ -11,6 +11,8 @@ GEDNDER_CHOICES = [
     ('Female', 'Female'),
     ('Unknown', 'Unknown'),
 ]
+
+
 class Project(models.Model):
     title = models.CharField(max_length=50)
     details = models.CharField(max_length=500)
@@ -25,7 +27,8 @@ class User(AbstractUser):
     email = models.EmailField(_('email address'), unique=True)
     phone_regex = RegexValidator(
         regex=r'^\+?1?\d{9,15}$',
-        message="Phone number must be entered in the format: '+999999999'. 9-15 digits allowed.",
+        message="""Phone number must be entered in the format: 
+                        '+999999999'. 9-15 digits allowed.""",
     )
     phone_number = models.CharField(
         validators=[phone_regex],
