@@ -24,7 +24,6 @@ axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 /*
 TODO
-Fix z haslem userowskim zmiana
 Testy API
 Refactoring
 Mieszkowski flex, automatyczne testy na github?
@@ -136,13 +135,21 @@ class App extends Component {
   };
 
   handleEdit = (item) => {
-    this.editToggle();
-    if (item.id) {
-      axios
-        .put(`/api/pms/projects/${item.id}/`, item)
-        .catch(() => alert("Something went wrong."))
-        .then(() => this.refreshList());
-      return;
+    if (item.title !== '' && item.details !== '' && item.start_date !== '' && item.end_date !== ''){
+      this.editToggle();
+      if (item.id) {
+        axios
+          .put(`/api/pms/projects/${item.id}/`, item, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          })
+          .catch(() => alert("Something went wrong."))
+          .then(() => this.refreshList());
+        return;
+      }
+    } else{
+      alert('Some of required fields are empty!')
     }
   };
 
@@ -150,7 +157,11 @@ class App extends Component {
     this.editUserToggle();
     if (user.id) {
       axios
-        .put(`/api/update/${user.id}/`, user)
+        .patch(`/api/userlist/${user.id}/`, user, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
         .catch(() => alert("Something went wrong."))
         .then(() => this.getInfo());
       return;
@@ -160,7 +171,11 @@ class App extends Component {
   handleCreate = (item, ownership) => {
     this.createToggle();
     axios
-      .post("/api/pms/projects/", item)
+      .post("/api/pms/projects/", item, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
       .catch(() => alert("Something went wrong."))
       .then((response) => this.ownershipUpdate(response.data.id, ownership))
       .then(() => this.refreshList())
@@ -175,6 +190,10 @@ class App extends Component {
         user_id: this.state.user.id,
         project_id: project_id,
         is_owner: true
+      },{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
       })
       .catch(() => alert("Something went wrong."))
     ownership.map((item) => (
@@ -184,6 +203,10 @@ class App extends Component {
           user_id: item.value,
           project_id: project_id,
           is_owner: false
+        },{
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
         })
         .catch(() => alert("Something went wrong."))
     ))
@@ -194,7 +217,7 @@ class App extends Component {
     this.commentToggle();
     axios
       .post("/api/comments/", item)
-      .catch(() => alert("Something went wrong."))
+      .catch(() => alert("Something went wrong. Comment field might be empty."))
       .then(() => this.detailsToggle());
   };
 

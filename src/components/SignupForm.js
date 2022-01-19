@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button, Modal, Form } from 'react-bootstrap'
 
 function SignupForm({ toggleCreate, onClose, onSave }) {
@@ -7,7 +7,6 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
   const toggleSignupConfirm = () => {
     setIsSignupConfirm(current => !current)
   }
-  console.log(currentUser)
   return (
       <Modal
         show={ toggleCreate }
@@ -82,9 +81,9 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
                 onChange = {(e) => setCurrentUser({...currentUser, gender:e.target.value})}
               >
               <option>Select gender</option>
-              <option value='Male'>Male</option>
-              <option value='Female'>Female</option>
-              <option value='Unknown'>Unknown</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Unknown</option>
               </Form.Control>
           </Form.Group>
           <Form.Group className="mb-3">
@@ -114,7 +113,7 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
         )}  
         { isSignupConfirm ? (      
           <Button variant="success" type="submit" onClick={() => onSave(currentUser)}>
-            CreateUser
+            Create User
           </Button>
           ) 
           : 

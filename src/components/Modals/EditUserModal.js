@@ -77,12 +77,13 @@ function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
               <Form.Control as = "select"
                 id="user-gender"
                 name="gender"
+                defaultValue = { user.gender }
                 disabled = { isEditUserConfirm ? "disabled" : ""}  
                 onChange = {(e) => setCurrentUser({...currentUser, gender:e.target.value})}
               >
-              <option value='Male'>Male</option>
-              <option value='Female'>Female</option>
-              <option value='Not Specified'>Not Specified</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Unknown</option>
               </Form.Control>
           </Form.Group>
           <Form.Group className="mb-3">

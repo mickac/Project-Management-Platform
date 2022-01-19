@@ -35,6 +35,7 @@ class ProjectView(APIView):
     def delete(self, request, pk, format=None):
         Project.objects.filter(pk=pk).delete()
         ProjectOwnership.objects.filter(project_id=pk).delete()
+        Comments.objects.filter(project_id=pk).delete()
         return Response(status.HTTP_200_OK)
 
 class CommentsView(viewsets.ModelViewSet):
@@ -71,6 +72,13 @@ class UserList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def patch(self, request, pk, format=None):
+        user = User.objects.filter(pk=pk).first()
+        serializer = ProjectSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserCreateAPIView(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -79,9 +87,7 @@ class UserCreateAPIView(viewsets.ModelViewSet):
 
 
 class UserUpdateAPIView(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
+    pass
 
 @api_view(['GET'])
 def current_user(request):
