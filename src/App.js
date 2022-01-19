@@ -28,8 +28,6 @@ Fix z haslem userowskim zmiana
 Testy API
 Refactoring
 Mieszkowski flex, automatyczne testy na github?
-Usuwanie ownership jak usuwam projekt
-PUT,DELETE METHODS
 */
 class App extends Component {
   constructor(props) {
@@ -321,15 +319,10 @@ class App extends Component {
   }
 
   renderItems = () => {
-/*    const preFilterItems = this.state.projectList.filter(
-        (item) => item.id === this.state.userProjects[i].project_id
-      )
-      console.log(preFilterItems)
-*/
     const newItems = this.state.projectList.filter(
-      (item) => item.status === this.state.status // && 
+      (item) => item.status === this.state.status
     );
-//    console.log(this.state.userProjects)
+
     return (
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} size="large" aria-label="a dense table">
