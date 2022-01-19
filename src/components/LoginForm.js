@@ -26,7 +26,12 @@ class LoginForm extends React.Component {
 
   handleSignup = (user) => {
     console.log(user)
-    if (user.email !== undefined && user.first_name !== undefined && user.last_name !== undefined && user.password !== undefined && user.birth_date !== undefined && user.gender !== undefined){
+    if (user.email !== undefined && 
+        user.first_name !== undefined && 
+        user.last_name !== undefined && 
+        user.password !== undefined && 
+        user.birth_date !== undefined && 
+        user.gender !== undefined){
       this.signupToggle();
       axios
         .post("/api/register/", user)

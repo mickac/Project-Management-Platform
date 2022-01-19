@@ -135,21 +135,24 @@ class App extends Component {
   };
 
   handleEdit = (item) => {
-    if (item.title !== '' && item.details !== '' && item.start_date !== '' && item.end_date !== ''){
+    if (item.title !== '' && 
+        item.details !== '' && 
+        item.start_date !== '' && 
+        item.end_date !== ''){
       this.editToggle();
-      if (item.id) {
-        axios
-          .put(`/api/pms/projects/${item.id}/`, item, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-          })
-          .catch(() => alert("Something went wrong."))
-          .then(() => this.refreshList());
-        return;
-      }
+        if (item.id) {
+          axios
+            .put(`/api/pms/projects/${item.id}/`, item, {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+              }
+            })
+            .catch(() => alert("Something went wrong."))
+            .then(() => this.refreshList());
+          return;
+        }
     } else{
-      alert('Some of required fields are empty!')
+       alert('Some of required fields are empty!')
     }
   };
 
@@ -169,20 +172,20 @@ class App extends Component {
   };
 
   handleCreate = (item, ownership) => {
-    this.createToggle();
-    axios
-      .post("/api/pms/projects/", item, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      })
-      .catch(() => alert("Something went wrong."))
-      .then((response) => this.ownershipUpdate(response.data.id, ownership))
-      .then(() => this.refreshList())
+      this.createToggle();
+      axios
+        .post("/api/pms/projects/", item, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        .catch(() => alert("Something went wrong. Some of required files might be empty."))
+        .then((response) => this.ownershipUpdate(response.data.id, ownership))
+        .catch(() => alert("Something went wrong."))
+        .then(() => this.refreshList())
   };
 
   ownershipUpdate = (id, ownership) => {
-    console.log(id)
     const project_id = id
     axios
       .post(`/api/ownership/`,
@@ -214,11 +217,16 @@ class App extends Component {
   }
   
   handleComment = (item) => {
-    this.commentToggle();
-    axios
-      .post("/api/comments/", item)
-      .catch(() => alert("Something went wrong. Comment field might be empty."))
-      .then(() => this.detailsToggle());
+    if (item.content !== undefined || item.content == ''){
+      this.commentToggle();
+      axios
+        .post("/api/comments/", item)
+        .catch(() => alert("Something went wrong."))
+        .then(() => this.detailsToggle());
+    }
+    else {
+      alert("Comment field cannot be empty.")
+    }
   };
 
   handleDelete = (item) => {
