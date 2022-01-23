@@ -10,7 +10,7 @@ function CommentModal({ activeItem, toggleComment, onClose, onSave, userId }) {
   const toggleCommentConfirm = () => {
     setIsConfirm((current) => !current);
   };
-  const [validComment, setValidComment] = useState(false);
+  const [validComment, setValidComment] = useState();
   return (
     <Modal
       show={toggleComment}
@@ -34,7 +34,7 @@ function CommentModal({ activeItem, toggleComment, onClose, onSave, userId }) {
               id="project-comment"
               name="comment"
               placeholder="Add comment"
-              disabled={isCommentConfirm ? "disabled" : ""}
+              disabled={isCommentConfirm}
               onChange={(e) => {
                 if (/^[a-zA-Z0-9 ]*$/.test(e.target.value)) {
                   setCurrentItem({ ...currentItem, content: e.target.value });
@@ -43,7 +43,7 @@ function CommentModal({ activeItem, toggleComment, onClose, onSave, userId }) {
                   setValidComment(false);
                 }
               }}
-              isInvalid={validComment ? "" : "isInvalid"}
+              isInvalid={validComment}
             />
             {validComment ? null : (
               <Form.Text className="text-danger">
@@ -75,7 +75,7 @@ function CommentModal({ activeItem, toggleComment, onClose, onSave, userId }) {
               type="submit"
               variant="primary"
               onClick={toggleCommentConfirm}
-              disabled={validComment ? "" : "disabled"}
+              disabled={!validComment}
             >
               Add comment
             </Button>
