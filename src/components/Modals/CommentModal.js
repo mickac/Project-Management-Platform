@@ -10,7 +10,9 @@ function CommentModal({ activeItem, toggleComment, onClose, onSave, userId }) {
   const toggleCommentConfirm = () => {
     setIsConfirm((current) => !current);
   };
-  const [validComment, setValidComment] = useState();
+  const [errors, setErrors] = useState({
+    content: true,
+  });
   return (
     <Modal
       show={toggleComment}
@@ -36,18 +38,23 @@ function CommentModal({ activeItem, toggleComment, onClose, onSave, userId }) {
               placeholder="Add comment"
               disabled={isCommentConfirm}
               onChange={(e) => {
-                if (/^[a-zA-Z0-9 ]*$/.test(e.target.value)) {
+                if (
+                  /^[a-zA-Z0-9 ]*$/.test(e.target.value) &&
+                  e.target.value !== ""
+                ) {
                   setCurrentItem({ ...currentItem, content: e.target.value });
-                  setValidComment(true);
+                  setErrors({ ...errors, content: false });
                 } else {
-                  setValidComment(false);
+                  setErrors({ ...errors, content: true });
                 }
               }}
-              isInvalid={validComment}
+              isValid={!errors.content}
+              isInvalid={errors.content}
             />
-            {validComment ? null : (
+            {!errors.content ? null : (
               <Form.Text className="text-danger">
-                Comments can contain only alphanumerical characters.
+                Comments can contain only alphanumerical characters and cannot
+                be empty.
               </Form.Text>
             )}
           </Form.Group>
@@ -75,7 +82,7 @@ function CommentModal({ activeItem, toggleComment, onClose, onSave, userId }) {
               type="submit"
               variant="primary"
               onClick={toggleCommentConfirm}
-              disabled={!validComment}
+              disabled={Object.values(errors).some((e) => e)}
             >
               Add comment
             </Button>
