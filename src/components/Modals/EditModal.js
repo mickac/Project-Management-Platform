@@ -8,7 +8,6 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
     setIsEditConfirm((current) => !current);
   };
   const [errors, setErrors] = useState({});
-  console.log(currentItem);
   return (
     <Modal
       show={toggleEdit}
@@ -27,7 +26,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             id="project-title"
             name="title"
             defaultValue={activeItem.title}
-            disabled={isEditConfirm ? "disabled" : ""}
+            disabled={isEditConfirm}
             onChange={(e) => {
               if (/^[a-zA-Z0-9 ]*$/.test(e.target.value)) {
                 setCurrentItem({ ...currentItem, title: e.target.value });
@@ -52,7 +51,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             id="project-details"
             name="details"
             defaultValue={activeItem.details}
-            disabled={isEditConfirm ? "disabled" : ""}
+            disabled={isEditConfirm}
             onChange={(e) => {
               if (/^[a-zA-Z0-9 ]*$/.test(e.target.value)) {
                 setCurrentItem({ ...currentItem, details: e.target.value });
@@ -77,7 +76,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             id="project-start-date"
             name="start-date"
             defaultValue={activeItem.start_date}
-            disabled={isEditConfirm ? "disabled" : ""}
+            disabled={isEditConfirm}
             onChange={(e) =>
               setCurrentItem({ ...currentItem, start_date: e.target.value })
             }
@@ -91,7 +90,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             id="project-end-date"
             name="end-date"
             defaultValue={activeItem.end_date}
-            disabled={isEditConfirm ? "disabled" : ""}
+            disabled={isEditConfirm}
             onChange={(e) => {
               setCurrentItem({ ...currentItem, end_date: e.target.value });
               if (currentItem.start_date >= currentItem.end_date) {
@@ -117,7 +116,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             id="project-status"
             name="status"
             defaultValue={activeItem.status}
-            disabled={isEditConfirm ? "disabled" : ""}
+            disabled={isEditConfirm}
             onChange={(e) =>
               setCurrentItem({ ...currentItem, status: e.target.value })
             }
