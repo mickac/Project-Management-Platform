@@ -3,6 +3,9 @@ import { Button, Form } from "react-bootstrap";
 import PropTypes from "prop-types";
 import SignupForm from "./SignupForm";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.css";
 
 class LoginForm extends React.Component {
   state = {
@@ -36,6 +39,17 @@ class LoginForm extends React.Component {
       this.signupToggle();
       axios
         .post("/api/register/", user)
+        .then(() => {
+          toast.success(`User ${user.email} has been created.`, {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        })
         .catch(() => alert("Something went wrong."));
     } else {
       alert("Some of required fields are empty!");
