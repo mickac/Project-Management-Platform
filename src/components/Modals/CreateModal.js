@@ -38,9 +38,15 @@ function CreateModal({
   const [errors, setErrors] = useState({
     title: true,
     details: true,
-    start_date: true,
-    end_date: true,
+    date_range: true,
   });
+  const validateDate = (start_date, end_date) => {
+    if (start_date !== "" && end_date !== "" && end_date >= start_date) {
+      setErrors({ ...errors, date_range: false });
+    } else {
+      setErrors({ ...errors, date_range: true });
+    }
+  };
   return (
     <Modal
       show={toggleCreate}
@@ -92,7 +98,7 @@ function CreateModal({
             onChange={(e) => {
               if (
                 /^[a-zA-Z0-9 ]*$/.test(e.target.value) &&
-                e.target.value != ""
+                e.target.value !== ""
               ) {
                 setCurrentItem({ ...currentItem, details: e.target.value });
                 setErrors({ ...errors, details: false });
@@ -119,21 +125,11 @@ function CreateModal({
             disabled={isCreateConfirm}
             onChange={(e) => {
               setCurrentItem({ ...currentItem, start_date: e.target.value });
-              if (e.target.value != "") {
-                setCurrentItem({ ...currentItem, details: e.target.value });
-                setErrors({ ...errors, start_date: false });
-              } else {
-                setErrors({ ...errors, start_date: true });
-              }
+              validateDate(e.target.value, currentItem.end_date);
             }}
-            isValid={!errors.start_date}
-            isInvalid={errors.start_date}
+            isValid={!errors.date_range}
+            isInvalid={errors.date_range}
           />
-          {!errors.start_date ? null : (
-            <Form.Text className="text-danger">
-              Start date cannot be empty.
-            </Form.Text>
-          )}
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>End date</Form.Label>
@@ -144,22 +140,15 @@ function CreateModal({
             disabled={isCreateConfirm}
             onChange={(e) => {
               setCurrentItem({ ...currentItem, end_date: e.target.value });
-              if (
-                currentItem.start_date >= e.target.value &&
-                e.target.value != ""
-              ) {
-                setCurrentItem({ ...currentItem, details: e.target.value });
-                setErrors({ ...errors, end_date: false });
-              } else {
-                setErrors({ ...errors, end_date: true });
-              }
+              validateDate(currentItem.start_date, e.target.value);
             }}
-            isValid={!errors.end_date}
-            isInvalid={errors.end_date}
+            isValid={!errors.date_range}
+            isInvalid={errors.date_range}
           />
-          {!errors.end_date ? null : (
+          {!errors.date_range ? null : (
             <Form.Text className="text-danger">
-              End date must be greater than start date and cannot be empty.
+              Either start date or end date is empty or start date is greater
+              than end date.
             </Form.Text>
           )}
         </Form.Group>
