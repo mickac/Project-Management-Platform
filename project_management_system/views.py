@@ -10,60 +10,80 @@ from .serializers import (
     CommentsSerializer,
     UserSerializer,
     UserSerializerWithToken,
-    ProjectOwnershipSerializer)
+    ProjectOwnershipSerializer,
+)
 from django.contrib.auth import get_user_model
+
 User = get_user_model()
 
 
 class ProjectView(APIView):
-    permission_classes = (IsAuthenticated,)
-
     def get(self, request, format=None):
-        projects = Project.objects.filter(user=request.user)
-        serializer = ProjectSerializer(projects, many=True)
-        return Response(serializer.data, status.HTTP_200_OK)
+        try:
+            projects = Project.objects.filter(user=request.user)
+            serializer = ProjectSerializer(projects, many=True)
+            return Response(serializer.data, status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def post(self, request, format=None):
-        serializer = ProjectSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            User.objects.filter(email=request.user)
+            serializer = ProjectSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request, pk, format=None):
         project = Project.objects.filter(pk=pk).first()
-        serializer = ProjectSerializer(project, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        project_owner = (
+            ProjectOwnership.objects.filter(project_id=project.pk)
+            .filter(is_owner=True)
+            .first()
+        )
+        if request.user == project_owner.user_id:
+            serializer = ProjectSerializer(project, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def delete(self, request, pk, format=None):
-        Project.objects.filter(pk=pk).delete()
-        ProjectOwnership.objects.filter(project_id=pk).delete()
-        Comments.objects.filter(project_id=pk).delete()
-        return Response(status.HTTP_200_OK)
+        project_owner = (
+            ProjectOwnership.objects.filter(project_id=pk).filter(is_owner=True).first()
+        )
+        if request.user == project_owner.user_id:
+            Project.objects.filter(pk=pk).delete()
+            ProjectOwnership.objects.filter(project_id=pk).delete()
+            Comments.objects.filter(project_id=pk).delete()
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class CommentsView(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
     serializer_class = CommentsSerializer
-    queryset = (Comments.objects.all()
-                .order_by('added')
-                .select_related('user_id'))
+    queryset = Comments.objects.all().order_by("added").select_related("user_id")
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['user_id', 'project_id']
+    filterset_fields = ["user_id", "project_id"]
 
 
 class UserView(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
 
 class OwnershipView(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
     serializer_class = ProjectOwnershipSerializer
     queryset = ProjectOwnership.objects.all()
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['user_id', 'project_id']
+    filterset_fields = ["user_id", "project_id"]
 
 
 class UserList(APIView):
@@ -81,8 +101,8 @@ class UserList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def patch(self, request, pk, format=None):
-        user = User.objects.filter(pk=pk).first()
+    def patch(self, request, format=None):
+        user = User.objects.filter(pk=request.user).first()
         serializer = ProjectSerializer(user, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -91,16 +111,12 @@ class UserList(APIView):
 
 
 class UserCreateAPIView(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (AllowAny,)
 
 
-class UserUpdateAPIView(viewsets.ModelViewSet):
-    pass
-
-
-@api_view(['GET'])
+@api_view(["GET"])
 def current_user(request):
     """
     Determine the current user by their token, and return their data
