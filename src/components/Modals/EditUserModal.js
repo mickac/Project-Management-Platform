@@ -8,7 +8,7 @@ function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
   const toggleEditConfirm = () => {
     setIsEditUserConfirm((current) => !current);
   };
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors] = useState({});
   return (
     <Modal
       show={toggleEditUser}
@@ -50,19 +50,22 @@ function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
             defaultValue={user.first_name}
             disabled={isEditUserConfirm}
             onChange={(e) => {
-              if (/^[a-z ,.'-]+$/i.test(e.target.value)) {
-                setCurrentUser({ ...currentUser, first_name: e.target.value })
-                setErrors({...errors, first_name: false})
+              if (
+                /^[a-z ,.'-]+$/i.test(e.target.value) &&
+                e.target.value != ""
+              ) {
+                setCurrentUser({ ...currentUser, first_name: e.target.value });
+                setErrors({ ...errors, first_name: false });
               } else {
-                setErrors({...errors, first_name: true})
-              }     
+                setErrors({ ...errors, first_name: true });
+              }
             }}
             isValid={!errors.first_name}
             isInvalid={errors.first_name}
           />
           {!errors.first_name ? null : (
             <Form.Text className="text-danger">
-                First name format is not correct.
+              First name format is not correct or it's empty.
             </Form.Text>
           )}
         </Form.Group>
@@ -75,19 +78,22 @@ function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
             defaultValue={user.last_name}
             disabled={isEditUserConfirm}
             onChange={(e) => {
-              if (/^[a-z ,.'-]+$/i.test(e.target.value)) {
-                setCurrentUser({ ...currentUser, last_name: e.target.value })
-                setErrors({...errors, last_name: false})
+              if (
+                /^[a-z ,.'-]+$/i.test(e.target.value) &&
+                e.target.value != ""
+              ) {
+                setCurrentUser({ ...currentUser, last_name: e.target.value });
+                setErrors({ ...errors, last_name: false });
               } else {
-                setErrors({...errors, last_name: true})
-              }     
+                setErrors({ ...errors, last_name: true });
+              }
             }}
             isValid={!errors.last_name}
             isInvalid={errors.last_name}
           />
           {!errors.last_name ? null : (
             <Form.Text className="text-danger">
-                Last format is not correct.
+              Last format is not correct or it's empty.
             </Form.Text>
           )}
         </Form.Group>
@@ -100,19 +106,22 @@ function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
             defaultValue={user.birth_date}
             disabled={isEditUserConfirm}
             onChange={(e) => {
-              if (moment().format("YYYY-MM-DD") > e.target.value) {
-                setCurrentUser({ ...currentUser, birth_date: e.target.value })
-                setErrors({...errors, birth_date: false})
+              if (
+                moment().format("YYYY-MM-DD") > e.target.value &&
+                e.target.value != ""
+              ) {
+                setCurrentUser({ ...currentUser, birth_date: e.target.value });
+                setErrors({ ...errors, birth_date: false });
               } else {
-                setErrors({...errors, birth_date: true})
-              }     
+                setErrors({ ...errors, birth_date: true });
+              }
             }}
             isValid={!errors.birth_date}
             isInvalid={errors.birth_date}
           />
           {!errors.birth_date ? null : (
             <Form.Text className="text-danger">
-                Birthday cannot be greater than current date.
+              Birthday cannot be greater than current date and cannot be empty.
             </Form.Text>
           )}
         </Form.Group>
@@ -142,20 +151,26 @@ function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
             defaultValue={user.phone_number}
             disabled={isEditUserConfirm}
             onChange={(e) => {
-              if (/^\+?1?\d{9,15}$/.test(e.target.value) || e.target.value === '' ) {
-                setCurrentUser({ ...currentUser, phone_number: e.target.value })
-                setErrors({...errors, phone_number: false})
+              if (
+                /^\+?1?\d{9,15}$/.test(e.target.value) ||
+                e.target.value === ""
+              ) {
+                setCurrentUser({
+                  ...currentUser,
+                  phone_number: e.target.value,
+                });
+                setErrors({ ...errors, phone_number: false });
               } else {
-                setErrors({...errors, phone_number: true})
-              }     
+                setErrors({ ...errors, phone_number: true });
+              }
             }}
             isValid={!errors.phone_number}
             isInvalid={errors.phone_number}
           />
           {!errors.phone_number ? null : (
             <Form.Text className="text-danger">
-                Phone number must be entered in the format: 
-                        '+999999999'. 9-15 digits allowed.
+              Phone number must be entered in the format: '+999999999'. 9-15
+              digits allowed.
             </Form.Text>
           )}
         </Form.Group>
@@ -182,10 +197,11 @@ function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
             Apply Changes
           </Button>
         ) : (
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             onClick={toggleEditConfirm}
-            disabled={Object.values(errors).some((e) => e)}>
+            disabled={Object.values(errors).some((e) => e)}
+          >
             Edit
           </Button>
         )}
