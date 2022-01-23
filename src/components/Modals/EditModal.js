@@ -96,7 +96,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             isValid={!errors.start_date}
             isInvalid={errors.start_date}
           />
-          {!errors.end_date ? null : (
+          {!errors.start_date ? null : (
             <Form.Text className="text-danger">
               Start date cannot be empty.
             </Form.Text>
