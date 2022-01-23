@@ -7,7 +7,8 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
   const toggleEditConfirm = () => {
     setIsEditConfirm((current) => !current);
   };
-
+  const [errors, setErrors] = useState({});
+  console.log(currentItem);
   return (
     <Modal
       show={toggleEdit}
@@ -27,10 +28,22 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             name="title"
             defaultValue={activeItem.title}
             disabled={isEditConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentItem({ ...currentItem, title: e.target.value })
-            }
+            onChange={(e) => {
+              if (/^[a-zA-Z0-9 ]*$/.test(e.target.value)) {
+                setCurrentItem({ ...currentItem, title: e.target.value });
+                setErrors({ ...errors, title: false });
+              } else {
+                setErrors({ ...errors, title: true });
+              }
+            }}
+            isValid={!errors.title}
+            isInvalid={errors.title}
           />
+          {!errors.title ? null : (
+            <Form.Text className="text-danger">
+              Title can contain only alphanumerical characters.
+            </Form.Text>
+          )}
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Details</Form.Label>
@@ -40,10 +53,22 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             name="details"
             defaultValue={activeItem.details}
             disabled={isEditConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentItem({ ...currentItem, details: e.target.value })
-            }
+            onChange={(e) => {
+              if (/^[a-zA-Z0-9 ]*$/.test(e.target.value)) {
+                setCurrentItem({ ...currentItem, details: e.target.value });
+                setErrors({ ...errors, details: false });
+              } else {
+                setErrors({ ...errors, details: true });
+              }
+            }}
+            isValid={!errors.details}
+            isInvalid={errors.details}
           />
+          {!errors.details ? null : (
+            <Form.Text className="text-danger">
+              Details can contain only alphanumerical characters.
+            </Form.Text>
+          )}
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Start date</Form.Label>
@@ -56,6 +81,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             onChange={(e) =>
               setCurrentItem({ ...currentItem, start_date: e.target.value })
             }
+            isValid={currentItem.start_date}
           />
         </Form.Group>
         <Form.Group className="mb-3">
@@ -66,10 +92,23 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             name="end-date"
             defaultValue={activeItem.end_date}
             disabled={isEditConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentItem({ ...currentItem, end_date: e.target.value })
-            }
+            onChange={(e) => {
+              setCurrentItem({ ...currentItem, end_date: e.target.value });
+              if (currentItem.start_date >= currentItem.end_date) {
+                setCurrentItem({ ...currentItem, details: e.target.value });
+                setErrors({ ...errors, end_date: false });
+              } else {
+                setErrors({ ...errors, end_date: true });
+              }
+            }}
+            isValid={!errors.end_date}
+            isInvalid={errors.end_date}
           />
+          {!errors.end_date ? null : (
+            <Form.Text className="text-danger">
+              End date must be greater than start date.
+            </Form.Text>
+          )}
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Status</Form.Label>
@@ -111,7 +150,11 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             Apply Changes
           </Button>
         ) : (
-          <Button variant="primary" onClick={toggleEditConfirm}>
+          <Button
+            variant="primary"
+            onClick={toggleEditConfirm}
+            disabled={Object.values(errors).some((e) => e)}
+          >
             Edit
           </Button>
         )}
