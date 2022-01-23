@@ -36,7 +36,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
               }
             }}
             isValid={!errors.title}
-            isInvalid={errors.title}
+            isInvalid={errors.title + currentItem.title}
           />
           {!errors.title ? null : (
             <Form.Text className="text-danger">
@@ -61,7 +61,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
               }
             }}
             isValid={!errors.details}
-            isInvalid={errors.details}
+            isInvalid={errors.details + currentItem.details}
           />
           {!errors.details ? null : (
             <Form.Text className="text-danger">
@@ -77,10 +77,17 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             name="start-date"
             defaultValue={activeItem.start_date}
             disabled={isEditConfirm}
-            onChange={(e) =>
-              setCurrentItem({ ...currentItem, start_date: e.target.value })
-            }
-            isValid={currentItem.start_date}
+            onChange={(e) => {
+              setCurrentItem({ ...currentItem, start_date: e.target.value });
+              if (currentItem.start_date === "") {
+                setCurrentItem({ ...currentItem, details: e.target.value });
+                setErrors({ ...errors, start_date: false });
+              } else {
+                setErrors({ ...errors, start_date: true });
+              }
+            }}
+            isValid={!errors.start_date}
+            isInvalid={errors.start_date + currentItem.start_date}
           />
         </Form.Group>
         <Form.Group className="mb-3">
@@ -93,7 +100,10 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             disabled={isEditConfirm}
             onChange={(e) => {
               setCurrentItem({ ...currentItem, end_date: e.target.value });
-              if (currentItem.start_date >= currentItem.end_date) {
+              if (
+                currentItem.start_date >= currentItem.end_date &&
+                currentItem.end_date === ""
+              ) {
                 setCurrentItem({ ...currentItem, details: e.target.value });
                 setErrors({ ...errors, end_date: false });
               } else {
@@ -101,11 +111,11 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
               }
             }}
             isValid={!errors.end_date}
-            isInvalid={errors.end_date}
+            isInvalid={errors.end_date + currentItem.end_date}
           />
           {!errors.end_date ? null : (
             <Form.Text className="text-danger">
-              End date must be greater than start date.
+              End date must be greater than start date and cannot be empty.
             </Form.Text>
           )}
         </Form.Group>
