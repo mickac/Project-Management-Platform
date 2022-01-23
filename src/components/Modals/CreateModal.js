@@ -11,7 +11,9 @@ function CreateModal({
   userFirstName,
   userLastName,
 }) {
-  const [currentItem, setCurrentItem] = useState();
+  const [currentItem, setCurrentItem] = useState({
+    start_date: "",
+  });
   const [currentOwnership, setCurrentOwnership] = useState([]);
   const [isCreateConfirm, setIsConfirm] = useState(false);
   const [currentMultiValue, setCurrentMultiValue] = useState([]);
@@ -33,6 +35,18 @@ function CreateModal({
       .then((res) => setCurrentOwnership(Object.values(res.data)))
       .catch(() => alert("Something went wrong."));
   }, []);
+  const [errors, setErrors] = useState({
+    title: true,
+    details: true,
+    date_range: true,
+  });
+  const validateDate = (start_date, end_date) => {
+    if (start_date !== "" && end_date !== "" && end_date >= start_date) {
+      setErrors({ ...errors, date_range: false });
+    } else {
+      setErrors({ ...errors, date_range: true });
+    }
+  };
   return (
     <Modal
       show={toggleCreate}
@@ -51,11 +65,27 @@ function CreateModal({
             id="project-title"
             name="title"
             placeholder="Enter title of the project"
-            disabled={isCreateConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentItem({ ...currentItem, title: e.target.value })
-            }
+            disabled={isCreateConfirm}
+            onChange={(e) => {
+              if (
+                /^[a-zA-Z0-9 ]*$/.test(e.target.value) &&
+                e.target.value != ""
+              ) {
+                setCurrentItem({ ...currentItem, title: e.target.value });
+                setErrors({ ...errors, title: false });
+              } else {
+                setErrors({ ...errors, title: true });
+              }
+            }}
+            isValid={!errors.title}
+            isInvalid={errors.title}
           />
+          {!errors.title ? null : (
+            <Form.Text className="text-danger">
+              Title can contain only alphanumerical characters and cannot be
+              empty.
+            </Form.Text>
+          )}
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Details</Form.Label>
@@ -64,11 +94,27 @@ function CreateModal({
             id="project-details"
             name="details"
             placeholder="Enter details of the project"
-            disabled={isCreateConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentItem({ ...currentItem, details: e.target.value })
-            }
+            disabled={isCreateConfirm}
+            onChange={(e) => {
+              if (
+                /^[a-zA-Z0-9 ]*$/.test(e.target.value) &&
+                e.target.value !== ""
+              ) {
+                setCurrentItem({ ...currentItem, details: e.target.value });
+                setErrors({ ...errors, details: false });
+              } else {
+                setErrors({ ...errors, details: true });
+              }
+            }}
+            isValid={!errors.details}
+            isInvalid={errors.details}
           />
+          {!errors.details ? null : (
+            <Form.Text className="text-danger">
+              Details can contain only alphanumerical characters and cannot be
+              empty.
+            </Form.Text>
+          )}
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Start date</Form.Label>
@@ -76,10 +122,13 @@ function CreateModal({
             type="date"
             id="project-start-date"
             name="start-date"
-            disabled={isCreateConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentItem({ ...currentItem, start_date: e.target.value })
-            }
+            disabled={isCreateConfirm}
+            onChange={(e) => {
+              setCurrentItem({ ...currentItem, start_date: e.target.value });
+              validateDate(e.target.value, currentItem.end_date);
+            }}
+            isValid={!errors.date_range}
+            isInvalid={errors.date_range}
           />
         </Form.Group>
         <Form.Group className="mb-3">
@@ -88,11 +137,20 @@ function CreateModal({
             type="date"
             id="project-end-date"
             name="end-date"
-            disabled={isCreateConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentItem({ ...currentItem, end_date: e.target.value })
-            }
+            disabled={isCreateConfirm}
+            onChange={(e) => {
+              setCurrentItem({ ...currentItem, end_date: e.target.value });
+              validateDate(currentItem.start_date, e.target.value);
+            }}
+            isValid={!errors.date_range}
+            isInvalid={errors.date_range}
           />
+          {!errors.date_range ? null : (
+            <Form.Text className="text-danger">
+              Either start date or end date is empty or start date is greater
+              than end date.
+            </Form.Text>
+          )}
         </Form.Group>
         Users in project
         <Select
@@ -103,7 +161,7 @@ function CreateModal({
           classNamePrefix="select"
           defaultValue={currentMultiValue}
           onChange={setCurrentMultiValue}
-          isDisabled={isCreateConfirm ? "disabled" : ""}
+          isDisabled={isCreateConfirm}
         />
         {isCreateConfirm
           ? "Note: Status of the new project will be set on 'New'. Please check all fields and confirm by pressing Apply Creation."
@@ -128,7 +186,11 @@ function CreateModal({
             Apply creation
           </Button>
         ) : (
-          <Button variant="primary" onClick={toggleCreateConfirm}>
+          <Button
+            variant="primary"
+            onClick={toggleCreateConfirm}
+            disabled={Object.values(errors).some((e) => e)}
+          >
             Create new project
           </Button>
         )}

@@ -12,6 +12,7 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import CreateIcon from "@mui/icons-material/Create";
 import AddCommentIcon from "@mui/icons-material/AddComment";
 import ListIcon from "@mui/icons-material/List";
+import { ToastContainer, toast } from "react-toastify";
 import EditModal from "./components/Modals/EditModal";
 import DetailsModal from "./components/Modals/DetailsModal";
 import CreateModal from "./components/Modals/CreateModal";
@@ -20,9 +21,10 @@ import DeleteModal from "./components/Modals/DeleteModal";
 import EditUserModal from "./components/Modals/EditUserModal";
 import LoginForm from "./components/LoginForm";
 
+import "react-toastify/dist/ReactToastify.css";
+
 axios.defaults.xsrfCookieName = "csrftoken";
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -34,6 +36,15 @@ class App extends Component {
       user: {},
       activeItem: {},
       activeComments: {},
+      notificationSettings: {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      },
     };
   }
 
@@ -44,6 +55,10 @@ class App extends Component {
       this.handle_logout();
     }
   }
+
+  errorNotification = () => {
+    toast.error(`Something went wrong.`, this.state.notificationSettings);
+  };
 
   refreshList = () => {
     axios
@@ -90,7 +105,13 @@ class App extends Component {
         this.getInfo();
         this.refreshList();
       })
-      .catch(() => alert("Invalid credentials."));
+      .then(() =>
+        toast.success(
+          `Successfully logged as ${data.email}.`,
+          this.state.notificationSettings
+        )
+      )
+      .catch(() => this.errorNotification());
   };
 
   handle_logout = () => {
@@ -100,6 +121,7 @@ class App extends Component {
       user: {},
       projectList: [],
     });
+    toast.info(`You have been logged out.`, this.state.notificationSettings);
   };
 
   handleEdit = (item) => {
@@ -118,7 +140,13 @@ class App extends Component {
             },
           })
           .then(() => this.refreshList())
-          .catch(() => alert("Something went wrong."));
+          .then(() =>
+            toast.success(
+              `Successfully edited project.`,
+              this.state.notificationSettings
+            )
+          )
+          .catch(() => this.errorNotification());
       }
     } else {
       alert("Some of required fields are empty!");
@@ -135,7 +163,13 @@ class App extends Component {
           },
         })
         .then(() => this.getInfo())
-        .catch(() => alert("Something went wrong."));
+        .then(() =>
+          toast.success(
+            `Successfully edited user profile.`,
+            this.state.notificationSettings
+          )
+        )
+        .catch(() => this.errorNotification());
     }
   };
 
@@ -149,9 +183,13 @@ class App extends Component {
       })
       .then((response) => this.ownershipUpdate(response.data.id, ownership))
       .then(() => this.refreshList())
-      .catch(() =>
-        alert("Something went wrong. Some of required files might be empty.")
-      );
+      .then(() =>
+        toast.success(
+          `Successfully created ${item.title}.`,
+          this.state.notificationSettings
+        )
+      )
+      .catch(() => this.errorNotification());
   };
 
   ownershipUpdate = (id, ownership) => {
@@ -170,7 +208,7 @@ class App extends Component {
           },
         }
       )
-      .catch(() => alert("Something went wrong."));
+      .catch(() => this.errorNotification());
     ownership.map((item) =>
       axios
         .post(
@@ -186,7 +224,7 @@ class App extends Component {
             },
           }
         )
-        .catch(() => alert("Something went wrong."))
+        .catch(() => this.errorNotification())
     );
   };
 
@@ -200,7 +238,13 @@ class App extends Component {
           },
         })
         .then(() => this.detailsToggle())
-        .catch(() => alert("Something went wrong."));
+        .then(() =>
+          toast.success(
+            `Comment has been added.`,
+            this.state.notificationSettings
+          )
+        )
+        .catch(() => this.errorNotification());
     } else {
       alert("Comment field cannot be empty.");
     }
@@ -215,7 +259,13 @@ class App extends Component {
         },
       })
       .then(() => this.refreshList())
-      .catch(() => alert("Something went wrong."));
+      .then(() =>
+        toast.success(
+          `Succesfully deleted project ${item.title}.`,
+          this.state.notificationSettings
+        )
+      )
+      .catch(() => this.errorNotification());
   };
 
   createToggle = () => {
@@ -497,6 +547,7 @@ class App extends Component {
             }}
           />
         ) : null}
+        <ToastContainer />
       </main>
     );
   }

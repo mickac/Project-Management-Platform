@@ -7,15 +7,20 @@ from django.core.validators import RegexValidator
 from project_management_system.managers import CustomUserManager
 
 GEDNDER_CHOICES = [
-    ('Male', 'Male'),
-    ('Female', 'Female'),
-    ('Unknown', 'Unknown'),
+    ("Male", "Male"),
+    ("Female", "Female"),
+    ("Unknown", "Unknown"),
 ]
 
 
 class Project(models.Model):
-    title = models.CharField(max_length=50)
-    details = models.CharField(max_length=500)
+    alphanumeric_regex = RegexValidator(
+        regex="^[a-zA-Z0-9 ]*$",
+        message="""This field can contain only
+                alphanumberical characters.""",
+    )
+    title = models.CharField(max_length=50, validators=[alphanumeric_regex])
+    details = models.CharField(max_length=500, validators=[alphanumeric_regex])
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.IntegerField(default=2)
@@ -23,22 +28,21 @@ class Project(models.Model):
 
 
 class User(AbstractUser):
-    username = None
-    email = models.EmailField(_('email address'), unique=True)
     phone_regex = RegexValidator(
-        regex=r'^\+?1?\d{9,15}$',
+        regex="^\ ?1?\d{9,15}$",
         message="""Phone number must be entered in the format: 
-                        '+999999999'. 9-15 digits allowed.""",
+                        ' 999999999'. 9-15 digits allowed.""",
     )
-    phone_number = models.CharField(
-        validators=[phone_regex],
-        max_length=17,
-        blank=True
+    username = None
+    email = models.EmailField(
+        _("email address"),
+        unique=True,
     )
+    phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
     gender = models.TextField(max_length=15, choices=GEDNDER_CHOICES)
     birth_date = models.DateField()
-    projects = models.ManyToManyField(Project, through='ProjectOwnership')
-    USERNAME_FIELD = 'email'
+    projects = models.ManyToManyField(Project, through="ProjectOwnership")
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
@@ -48,9 +52,14 @@ class User(AbstractUser):
 
 
 class Comments(models.Model):
+    alphanumeric_regex = RegexValidator(
+        regex="^[a-zA-Z0-9 ]*$",
+        message="""This field can contain only
+                alphanumberical characters.""",
+    )
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     project_id = models.ForeignKey(Project, on_delete=models.CASCADE)
-    content = models.CharField(max_length=500)
+    content = models.CharField(max_length=500, validators=[alphanumeric_regex])
     added = models.DateTimeField(auto_now_add=True, blank=True)
 
 

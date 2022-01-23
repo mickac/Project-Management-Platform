@@ -9,17 +9,22 @@ from rest_framework_simplejwt.views import (
 from project_management_system import views
 
 router = routers.DefaultRouter()
-router.register(r'comments', views.CommentsView, basename='comment')
-router.register(r'userlist', views.UserView, basename='userlist')
-router.register(r'ownership', views.OwnershipView, basename='ownership')
-router.register(r'register', views.UserCreateAPIView, basename='register')
-router.register(r'update', views.UserUpdateAPIView, basename='update')
+router.register(r"comments", views.CommentsView, basename="comment")
+router.register(r"userlist", views.UserView, basename="userlist")
+router.register(r"ownership", views.OwnershipView, basename="ownership")
+router.register(r"register", views.UserCreateAPIView, basename="register")
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/pms/', include('project_management_system.urls', namespace='project_management_system')),
-    re_path('.*', TemplateView.as_view(template_name='index.html')),
+    path("admin/", admin.site.urls),
+    path("api/", include(router.urls)),
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path(
+        "api/pms/",
+        include(
+            "project_management_system.urls", namespace="project_management_system"
+        ),
+    ),
+    re_path(".*", TemplateView.as_view(template_name="index.html")),
 ]

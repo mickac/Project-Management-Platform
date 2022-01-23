@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import moment from "moment";
 import { Button, Modal, Form } from "react-bootstrap";
 
 function SignupForm({ toggleCreate, onClose, onSave }) {
@@ -7,6 +8,13 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
   const toggleSignupConfirm = () => {
     setIsSignupConfirm((current) => !current);
   };
+  const [errors, setErrors] = useState({
+    email: true,
+    password: true,
+    first_name: true,
+    last_name: true,
+    birth_date: true,
+  });
   return (
     <Modal
       show={toggleCreate}
@@ -21,15 +29,30 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
         <Form.Group className="mb-3">
           <Form.Label>E-mail</Form.Label>
           <Form.Control
-            type="text"
+            type="email"
             id="user-email"
             name="email"
             placeholder="Provide e-mail (this will be your login)"
-            disabled={isSignupConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentUser({ ...currentUser, email: e.target.value })
-            }
+            disabled={isSignupConfirm}
+            onChange={(e) => {
+              if (
+                /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i.test(e.target.value) &&
+                e.target.value !== ""
+              ) {
+                setCurrentUser({ ...currentUser, email: e.target.value });
+                setErrors({ ...errors, email: false });
+              } else {
+                setErrors({ ...errors, email: true });
+              }
+            }}
+            isValid={!errors.email}
+            isInvalid={errors.email}
           />
+          {!errors.email ? null : (
+            <Form.Text className="text-danger">
+              E-mail format is not correct or it's empty.
+            </Form.Text>
+          )}
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>First name</Form.Label>
@@ -38,11 +61,26 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
             id="user-first-name"
             name="first_name"
             placeholder="Provide first name"
-            disabled={isSignupConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentUser({ ...currentUser, first_name: e.target.value })
-            }
+            disabled={isSignupConfirm}
+            onChange={(e) => {
+              if (
+                /^[a-z ,.'-]+$/i.test(e.target.value) &&
+                e.target.value !== ""
+              ) {
+                setCurrentUser({ ...currentUser, first_name: e.target.value });
+                setErrors({ ...errors, first_name: false });
+              } else {
+                setErrors({ ...errors, first_name: true });
+              }
+            }}
+            isValid={!errors.first_name}
+            isInvalid={errors.first_name}
           />
+          {!errors.first_name ? null : (
+            <Form.Text className="text-danger">
+              First name format is not correct or it's empty.
+            </Form.Text>
+          )}
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Last name</Form.Label>
@@ -51,11 +89,26 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
             id="user-last-name"
             name="last_name"
             placeholder="Provide last name"
-            disabled={isSignupConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentUser({ ...currentUser, last_name: e.target.value })
-            }
+            disabled={isSignupConfirm}
+            onChange={(e) => {
+              if (
+                /^[a-z ,.'-]+$/i.test(e.target.value) &&
+                e.target.value !== ""
+              ) {
+                setCurrentUser({ ...currentUser, last_name: e.target.value });
+                setErrors({ ...errors, last_name: false });
+              } else {
+                setErrors({ ...errors, last_name: true });
+              }
+            }}
+            isValid={!errors.last_name}
+            isInvalid={errors.last_name}
           />
+          {!errors.last_name ? null : (
+            <Form.Text className="text-danger">
+              Last name format is not correct or it's empty.
+            </Form.Text>
+          )}
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Password</Form.Label>
@@ -64,11 +117,23 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
             id="user-password"
             name="password"
             placeholder="Enter password"
-            disabled={isSignupConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentUser({ ...currentUser, password: e.target.value })
-            }
+            disabled={isSignupConfirm}
+            onChange={(e) => {
+              if (e.target.value !== "") {
+                setCurrentUser({ ...currentUser, password: e.target.value });
+                setErrors({ ...errors, password: false });
+              } else {
+                setErrors({ ...errors, password: true });
+              }
+            }}
+            isValid={!errors.password}
+            isInvalid={errors.password}
           />
+          {!errors.password ? null : (
+            <Form.Text className="text-danger">
+              Password cannot be empty.
+            </Form.Text>
+          )}
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Birth date</Form.Label>
@@ -76,11 +141,26 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
             type="date"
             id="user-birthdate"
             name="birth_date"
-            disabled={isSignupConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentUser({ ...currentUser, birth_date: e.target.value })
-            }
+            disabled={isSignupConfirm}
+            onChange={(e) => {
+              if (
+                moment().format("YYYY-MM-DD") > e.target.value &&
+                e.target.value !== ""
+              ) {
+                setCurrentUser({ ...currentUser, birth_date: e.target.value });
+                setErrors({ ...errors, birth_date: false });
+              } else {
+                setErrors({ ...errors, birth_date: true });
+              }
+            }}
+            isValid={!errors.birth_date}
+            isInvalid={errors.birth_date}
           />
+          {!errors.birth_date ? null : (
+            <Form.Text className="text-danger">
+              Birthday cannot be greater than current date and cannot be empty.
+            </Form.Text>
+          )}
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Gender</Form.Label>
@@ -88,7 +168,7 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
             as="select"
             id="user-gender"
             name="gender"
-            disabled={isSignupConfirm ? "disabled" : ""}
+            disabled={isSignupConfirm}
             onChange={(e) =>
               setCurrentUser({ ...currentUser, gender: e.target.value })
             }
@@ -108,11 +188,30 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
             id="user-phone"
             name="phone_number"
             placeholder="Provide phone number (not required)"
-            disabled={isSignupConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentUser({ ...currentUser, phone_number: e.target.value })
-            }
+            disabled={isSignupConfirm}
+            onChange={(e) => {
+              if (
+                /^\+?1?\d{9,15}$/.test(e.target.value) ||
+                e.target.value === ""
+              ) {
+                setCurrentUser({
+                  ...currentUser,
+                  phone_number: e.target.value,
+                });
+                setErrors({ ...errors, phone_number: false });
+              } else {
+                setErrors({ ...errors, phone_number: true });
+              }
+            }}
+            isValid={!errors.phone_number}
+            isInvalid={errors.phone_number}
           />
+          {!errors.phone_number ? null : (
+            <Form.Text className="text-danger">
+              Phone number must be entered in the format: '+999999999'. 9-15
+              digits allowed.
+            </Form.Text>
+          )}
         </Form.Group>
         {isSignupConfirm
           ? "Note: Check all fields and accept by pressing Create user"
@@ -137,7 +236,11 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
             Create User
           </Button>
         ) : (
-          <Button variant="primary" onClick={toggleSignupConfirm}>
+          <Button
+            variant="primary"
+            onClick={toggleSignupConfirm}
+            disabled={Object.values(errors).some((e) => e)}
+          >
             Submit
           </Button>
         )}

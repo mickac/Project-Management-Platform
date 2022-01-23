@@ -7,7 +7,14 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
   const toggleEditConfirm = () => {
     setIsEditConfirm((current) => !current);
   };
-
+  const [errors, setErrors] = useState({});
+  const validateDate = (start_date, end_date) => {
+    if (start_date !== "" && end_date !== "" && end_date >= start_date) {
+      setErrors({ ...errors, date_range: false });
+    } else {
+      setErrors({ ...errors, date_range: true });
+    }
+  };
   return (
     <Modal
       show={toggleEdit}
@@ -26,11 +33,27 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             id="project-title"
             name="title"
             defaultValue={activeItem.title}
-            disabled={isEditConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentItem({ ...currentItem, title: e.target.value })
-            }
+            disabled={isEditConfirm}
+            onChange={(e) => {
+              if (
+                /^[a-zA-Z0-9 ]*$/.test(e.target.value) &&
+                e.target.value !== ""
+              ) {
+                setCurrentItem({ ...currentItem, title: e.target.value });
+                setErrors({ ...errors, title: false });
+              } else {
+                setErrors({ ...errors, title: true });
+              }
+            }}
+            isValid={!errors.title}
+            isInvalid={errors.title}
           />
+          {!errors.title ? null : (
+            <Form.Text className="text-danger">
+              Title can contain only alphanumerical characters and cannot be
+              empty.
+            </Form.Text>
+          )}
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Details</Form.Label>
@@ -39,11 +62,27 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             id="project-details"
             name="details"
             defaultValue={activeItem.details}
-            disabled={isEditConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentItem({ ...currentItem, details: e.target.value })
-            }
+            disabled={isEditConfirm}
+            onChange={(e) => {
+              if (
+                /^[a-zA-Z0-9 ]*$/.test(e.target.value) &&
+                e.target.value !== ""
+              ) {
+                setCurrentItem({ ...currentItem, details: e.target.value });
+                setErrors({ ...errors, details: false });
+              } else {
+                setErrors({ ...errors, details: true });
+              }
+            }}
+            isValid={!errors.details}
+            isInvalid={errors.details}
           />
+          {!errors.details ? null : (
+            <Form.Text className="text-danger">
+              Details can contain only alphanumerical characters and cannot be
+              empty.
+            </Form.Text>
+          )}
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Start date</Form.Label>
@@ -52,10 +91,13 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             id="project-start-date"
             name="start-date"
             defaultValue={activeItem.start_date}
-            disabled={isEditConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentItem({ ...currentItem, start_date: e.target.value })
-            }
+            disabled={isEditConfirm}
+            onChange={(e) => {
+              setCurrentItem({ ...currentItem, start_date: e.target.value });
+              validateDate(e.target.value, currentItem.end_date);
+            }}
+            isValid={!errors.date_range}
+            isInvalid={errors.date_range}
           />
         </Form.Group>
         <Form.Group className="mb-3">
@@ -65,11 +107,20 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             id="project-end-date"
             name="end-date"
             defaultValue={activeItem.end_date}
-            disabled={isEditConfirm ? "disabled" : ""}
-            onChange={(e) =>
-              setCurrentItem({ ...currentItem, end_date: e.target.value })
-            }
+            disabled={isEditConfirm}
+            onChange={(e) => {
+              setCurrentItem({ ...currentItem, end_date: e.target.value });
+              validateDate(currentItem.start_date, e.target.value);
+            }}
+            isValid={!errors.date_range}
+            isInvalid={errors.date_range}
           />
+          {!errors.date_range ? null : (
+            <Form.Text className="text-danger">
+              Either start date or end date is empty or start date is greater
+              than end date.
+            </Form.Text>
+          )}
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Status</Form.Label>
@@ -78,7 +129,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             id="project-status"
             name="status"
             defaultValue={activeItem.status}
-            disabled={isEditConfirm ? "disabled" : ""}
+            disabled={isEditConfirm}
             onChange={(e) =>
               setCurrentItem({ ...currentItem, status: e.target.value })
             }
@@ -111,7 +162,11 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             Apply Changes
           </Button>
         ) : (
-          <Button variant="primary" onClick={toggleEditConfirm}>
+          <Button
+            variant="primary"
+            onClick={toggleEditConfirm}
+            disabled={Object.values(errors).some((e) => e)}
+          >
             Edit
           </Button>
         )}
