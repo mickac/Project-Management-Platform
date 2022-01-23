@@ -1,4 +1,4 @@
-<h1 align="center"> Book management system </h1>
+<h1 align="center"> Project management platform </h1>
 
 Simple system for project management.
 
