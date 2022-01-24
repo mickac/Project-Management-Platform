@@ -73,11 +73,8 @@ class CommentsView(APIView):
         return Response(serializer.data, status.HTTP_200_OK)
 
     def post(self, request, pk=None, format=None):
-        print(request.data)
         user_request = User.objects.filter(email=request.user).first()
         user_data = User.objects.filter(pk=request.data['user_id']).first()
-        print(user_request)
-        print(user_data)
         if user_request == user_data:
             serializer = CommentsSerializer(data=request.data)
             if serializer.is_valid():
