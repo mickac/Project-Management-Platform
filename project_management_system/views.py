@@ -28,6 +28,8 @@ class ProjectView(APIView):
 
     def post(self, request, format=None):
         try:
+            if request.data["start_date"] > request.data["end_date"]:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
             project = {
                 "title": request.data["title"],
                 "details": request.data["details"],

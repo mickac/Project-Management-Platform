@@ -89,9 +89,6 @@ class App extends Component {
   handle_login = (e, data) => {
     e.preventDefault();
     const options = {
-      headers: {
-        "Content-Type": "application/json",
-      },
       email: data.email,
       password: data.password,
     };
