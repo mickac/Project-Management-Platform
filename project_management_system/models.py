@@ -33,7 +33,13 @@ class User(AbstractUser):
         message="""Phone number must be entered in the format: 
                         ' 999999999'. 9-15 digits allowed.""",
     )
+    name_regex = RegexValidator(
+        regex="^[a-zA-Z ,.'-]+$",
+        message="""Not valid format for name.""",
+    )    
     username = None
+    first_name = models.CharField(validators=[name_regex], max_length=15)
+    last_name = models.CharField(validators=[name_regex], max_length=15)
     email = models.EmailField(
         _("email address"),
         unique=True,

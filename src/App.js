@@ -200,7 +200,7 @@ class App extends Component {
   };
 
   handleComment = (item) => {
-    if (item.content !== undefined || item.content == "") {
+    if (item.content !== undefined || item.content === "") {
       this.commentToggle();
       axios
         .post("/api/pms/comments/", item, {

@@ -69,7 +69,7 @@ function CreateModal({
             onChange={(e) => {
               if (
                 /^[a-zA-Z0-9 ]*$/.test(e.target.value) &&
-                e.target.value != ""
+                e.target.value !== ""
               ) {
                 setCurrentItem({ ...currentItem, title: e.target.value });
                 setErrors({ ...errors, title: false });

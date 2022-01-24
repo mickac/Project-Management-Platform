@@ -52,7 +52,7 @@ function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
             onChange={(e) => {
               if (
                 /^[a-z ,.'-]+$/i.test(e.target.value) &&
-                e.target.value != ""
+                e.target.value !== ""
               ) {
                 setCurrentUser({ ...currentUser, first_name: e.target.value });
                 setErrors({ ...errors, first_name: false });
@@ -80,7 +80,7 @@ function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
             onChange={(e) => {
               if (
                 /^[a-z ,.'-]+$/i.test(e.target.value) &&
-                e.target.value != ""
+                e.target.value !== ""
               ) {
                 setCurrentUser({ ...currentUser, last_name: e.target.value });
                 setErrors({ ...errors, last_name: false });
@@ -108,7 +108,7 @@ function EditUserModal({ user, toggleEditUser, onClose, onSave }) {
             onChange={(e) => {
               if (
                 moment().format("YYYY-MM-DD") > e.target.value &&
-                e.target.value != ""
+                e.target.value !== ""
               ) {
                 setCurrentUser({ ...currentUser, birth_date: e.target.value });
                 setErrors({ ...errors, birth_date: false });
