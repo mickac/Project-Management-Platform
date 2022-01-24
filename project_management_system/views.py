@@ -64,16 +64,39 @@ class ProjectView(APIView):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-class CommentsView(viewsets.ModelViewSet):
+class CommentsView(APIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = CommentsSerializer
-    queryset = Comments.objects.all().order_by("added").select_related("user_id")
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["user_id", "project_id"]
 
+    def get(self, request, pk, format=None):
+        comments = Comments.objects.filter(project_id=pk).order_by("added").select_related("user_id")
+        serializer = CommentsSerializer(comments, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
+
+    def post(self, request, pk=None, format=None):
+        print(request.data)
+        user_request = User.objects.filter(email=request.user).first()
+        user_data = User.objects.filter(pk=request.data['user_id']).first()
+        print(user_request)
+        print(user_data)
+        if user_request == user_data:
+            serializer = CommentsSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 class UserView(APIView):
     permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        try:
+            User.objects.filter(email=request.user)
+            users = User.objects.all()
+            serializer = UserSerializer(users, many=True)
+            return Response(serializer.data, status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def patch(self, request, format=None):
         user = User.objects.filter(email=request.user).first()

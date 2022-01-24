@@ -232,7 +232,7 @@ class App extends Component {
     if (item.content !== undefined || item.content == "") {
       this.commentToggle();
       axios
-        .post("/api/comments/", item, {
+        .post("/api/pms/comments/", item, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },

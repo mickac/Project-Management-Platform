@@ -28,7 +28,7 @@ function DetailsModal({
     let isCancelled = false;
 
     axios
-      .get(`/api/comments/?project_id=${activeItem.id}`, {
+      .get(`/api/pms/comments/${activeItem.id}/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

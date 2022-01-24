@@ -27,7 +27,7 @@ function CreateModal({
   };
   useEffect(() => {
     axios
-      .get(`/api/userlist/`, {
+      .get(`/api/pms/userlist/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
