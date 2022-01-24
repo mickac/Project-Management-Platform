@@ -72,11 +72,16 @@ class CommentsView(viewsets.ModelViewSet):
     filterset_fields = ["user_id", "project_id"]
 
 
-class UserView(viewsets.ModelViewSet):
+class UserView(APIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
 
+    def patch(self, request, format=None):
+        user = User.objects.filter(email=request.user).first()
+        serializer = UserSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class OwnershipView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
@@ -99,14 +104,6 @@ class UserList(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def patch(self, request, format=None):
-        user = User.objects.filter(pk=request.user).first()
-        serializer = ProjectSerializer(user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

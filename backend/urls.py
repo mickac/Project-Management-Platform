@@ -10,7 +10,7 @@ from project_management_system import views
 
 router = routers.DefaultRouter()
 router.register(r"comments", views.CommentsView, basename="comment")
-router.register(r"userlist", views.UserView, basename="userlist")
+#router.register(r"userlist", views.UserView, basename="userlist")
 router.register(r"ownership", views.OwnershipView, basename="ownership")
 router.register(r"register", views.UserCreateAPIView, basename="register")
 

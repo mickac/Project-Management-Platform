@@ -157,7 +157,7 @@ class App extends Component {
     this.editUserToggle();
     if (user.id) {
       axios
-        .patch(`/api/userlist/${user.id}/`, user, {
+        .patch(`/api/pms/userlist/`, user, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
