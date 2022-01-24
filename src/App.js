@@ -175,13 +175,26 @@ class App extends Component {
 
   handleCreate = (item, ownership) => {
     this.createToggle();
+    const owner = {
+      owner: {
+      label: this.state.user.first_name + " " + this.state.user.last_name,
+      value: this.state.user.id
+      },
+      title: item.title,
+      details: item.details,
+      start_date: item.start_date,
+      end_date: item.end_date,
+    }
+    const members = Object.assign({}, ownership)
+    const data = { ...owner, ...members,}
+    console.log(data)
     axios
-      .post("/api/pms/projects/", item, {
+      .post("/api/pms/projects/", data, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
-      .then((response) => this.ownershipUpdate(response.data.id, ownership))
+ //     .then((response) => this.ownershipUpdate(response.data.id, ownership))
       .then(() => this.refreshList())
       .then(() =>
         toast.success(

@@ -28,10 +28,40 @@ class ProjectView(APIView):
 
     def post(self, request, format=None):
         try:
-            User.objects.filter(email=request.user)
-            serializer = ProjectSerializer(data=request.data)
+            project = {
+                "title": request.data["title"],
+                "details": request.data["details"],
+                "start_date": request.data["start_date"],
+                "end_date": request.data["end_date"],
+            }
+            print(request.user.id)
+            serializer = ProjectSerializer(data=project)
             if serializer.is_valid():
                 serializer.save()
+                project_id = serializer.data["id"]
+                owner = {
+                    "project_id": project_id,
+                    "user_id": request.user.id,
+                    "is_owner": True,
+                }
+                owner_serializer = ProjectOwnershipSerializer(data=owner)
+                if owner_serializer.is_valid():
+                    owner_serializer.save()
+                else:
+                    return Response(status=status.HTTP_401_UNAUTHORIZED)
+                del request.data["title"]
+                del request.data["details"]
+                del request.data["start_date"]
+                del request.data["end_date"]
+                for i in request.data:
+                    member = {
+                        "project_id": project_id,
+                        "user_id": request.data[i]["value"],
+                        "is_owner": False,
+                    }
+                    member_serializer = ProjectOwnershipSerializer(data=member)
+                    if member_serializer.is_valid():
+                        member_serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except:
@@ -134,6 +164,7 @@ class OwnershipView(viewsets.ModelViewSet):
     queryset = ProjectOwnership.objects.all()
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["user_id", "project_id"]
+    http_method_names = ["get"]
 
 
 class UserList(APIView):
