@@ -68,20 +68,44 @@ class CommentsView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk, format=None):
-        comments = Comments.objects.filter(project_id=pk).order_by("added").select_related("user_id")
+        comments = (
+            Comments.objects.filter(project_id=pk)
+            .order_by("added")
+            .select_related("user_id")
+        )
         serializer = CommentsSerializer(comments, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
     def post(self, request, pk=None, format=None):
-        user_request = User.objects.filter(email=request.user).first()
-        user_data = User.objects.filter(pk=request.data['user_id']).first()
-        if user_request == user_data:
-            serializer = CommentsSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            user_request = User.objects.filter(email=request.user).first()
+            user_data = User.objects.filter(pk=request.data["user_id"]).first()
+            project_member = (
+                ProjectOwnership.objects.filter(project_id=request.data["project_id"])
+                .filter(user_id=request.user)
+                .first()
+            )
+            print(project_member)
+            project_member_validation = (
+                ProjectOwnership.objects.filter(project_id=request.data["project_id"])
+                .filter(user_id=request.data["user_id"])
+                .first()
+            )
+            if project_member == None or project_member_validation == None:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            if (
+                user_request == user_data
+                and project_member == project_member_validation
+            ):
+                serializer = CommentsSerializer(data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
 class UserView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -102,6 +126,7 @@ class UserView(APIView):
             serializer.save()
             return Response(serializer.data, status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class OwnershipView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
