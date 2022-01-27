@@ -41,7 +41,7 @@ function DetailsModal({
       })
       .catch(() => alert("Something went wrong."));
     axios
-      .get(`/api/ownership/?project_id=${activeItem.id}`, {
+      .get(`/api/pms/ownership/${activeItem.id}/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

@@ -9,7 +9,7 @@ from .serializers import (
     ProjectSerializer,
     CommentsSerializer,
     UserSerializer,
-    UserSerializerWithToken,
+    UserListSerializer,
     ProjectOwnershipSerializer,
 )
 from django.contrib.auth import get_user_model
@@ -106,7 +106,6 @@ class CommentsView(APIView):
                 .filter(user_id=user)
                 .first()
             )
-            print(user, project_member)
             if project_member == None:
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
             comments = (
@@ -156,7 +155,7 @@ class UserView(APIView):
         try:
             User.objects.filter(email=request.user)
             users = User.objects.all()
-            serializer = UserSerializer(users, many=True)
+            serializer = UserListSerializer(users, many=True)
             return Response(serializer.data, status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -170,29 +169,26 @@ class UserView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class OwnershipView(viewsets.ModelViewSet):
+class OwnershipView(APIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = ProjectOwnershipSerializer
-    queryset = ProjectOwnership.objects.all()
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["user_id", "project_id"]
-    http_method_names = ["get"]
 
-
-class UserList(APIView):
-    """
-    Create a new user. It's called 'UserList' because normally we'd have a get
-    method here too, for retrieving a list of all User objects.
-    """
-
-    permission_classes = (permissions.AllowAny,)
-
-    def post(self, request, format=None):
-        serializer = UserSerializerWithToken(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request, pk, format=None):
+        try:
+            user = User.objects.filter(email=request.user).first()
+            ownership = ProjectOwnership.objects.filter(project_id=pk)
+            print(ownership)
+            project_member = (
+                ProjectOwnership.objects.filter(user_id=user)
+                .filter(project_id=pk)
+                .first()
+            )
+            print(project_member)
+            if project_member == None:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            serializer = ProjectOwnershipSerializer(ownership, many=True)
+            return Response(serializer.data, status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class UserCreateAPIView(viewsets.ModelViewSet):
