@@ -35,11 +35,7 @@ function CreateModal({
       .then((res) => setCurrentOwnership(Object.values(res.data)))
       .catch(() => alert("Something went wrong."));
   }, []);
-  const [errors, setErrors] = useState({
-    title: true,
-    details: true,
-    date_range: true,
-  });
+  const [errors, setErrors] = useState({});
   const validateDate = (start_date, end_date) => {
     if (start_date !== "" && end_date !== "" && end_date >= start_date) {
       setErrors({ ...errors, date_range: false });
@@ -77,7 +73,7 @@ function CreateModal({
                 setErrors({ ...errors, title: true });
               }
             }}
-            isValid={!errors.title}
+            isValid={!errors.title && currentItem.title}
             isInvalid={errors.title}
           />
           {!errors.title ? null : (
@@ -106,7 +102,7 @@ function CreateModal({
                 setErrors({ ...errors, details: true });
               }
             }}
-            isValid={!errors.details}
+            isValid={!errors.details && currentItem.details}
             isInvalid={errors.details}
           />
           {!errors.details ? null : (
@@ -127,7 +123,7 @@ function CreateModal({
               setCurrentItem({ ...currentItem, start_date: e.target.value });
               validateDate(e.target.value, currentItem.end_date);
             }}
-            isValid={!errors.date_range}
+            isValid={!errors.date_range && currentItem.start_date}
             isInvalid={errors.date_range}
           />
         </Form.Group>
@@ -142,7 +138,7 @@ function CreateModal({
               setCurrentItem({ ...currentItem, end_date: e.target.value });
               validateDate(currentItem.start_date, e.target.value);
             }}
-            isValid={!errors.date_range}
+            isValid={!errors.date_range && currentItem.end_date}
             isInvalid={errors.date_range}
           />
           {!errors.date_range ? null : (
@@ -189,7 +185,13 @@ function CreateModal({
           <Button
             variant="primary"
             onClick={toggleCreateConfirm}
-            disabled={Object.values(errors).some((e) => e)}
+            disabled={
+              Object.values(errors).some((e) => e) ||
+              !currentItem.title ||
+              !currentItem.details ||
+              !currentItem.start_date ||
+              !currentItem.end_date
+            }
           >
             Create new project
           </Button>

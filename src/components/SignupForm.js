@@ -3,18 +3,12 @@ import moment from "moment";
 import { Button, Modal, Form } from "react-bootstrap";
 
 function SignupForm({ toggleCreate, onClose, onSave }) {
-  const [currentUser, setCurrentUser] = useState();
+  const [currentUser, setCurrentUser] = useState({});
   const [isSignupConfirm, setIsSignupConfirm] = useState(false);
   const toggleSignupConfirm = () => {
     setIsSignupConfirm((current) => !current);
   };
-  const [errors, setErrors] = useState({
-    email: true,
-    password: true,
-    first_name: true,
-    last_name: true,
-    birth_date: true,
-  });
+  const [errors, setErrors] = useState({});
   return (
     <Modal
       show={toggleCreate}
@@ -45,7 +39,7 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
                 setErrors({ ...errors, email: true });
               }
             }}
-            isValid={!errors.email}
+            isValid={!errors.email && currentUser.email}
             isInvalid={errors.email}
           />
           {!errors.email ? null : (
@@ -73,7 +67,7 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
                 setErrors({ ...errors, first_name: true });
               }
             }}
-            isValid={!errors.first_name}
+            isValid={!errors.first_name && currentUser.first_name}
             isInvalid={errors.first_name}
           />
           {!errors.first_name ? null : (
@@ -101,7 +95,7 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
                 setErrors({ ...errors, last_name: true });
               }
             }}
-            isValid={!errors.last_name}
+            isValid={!errors.last_name && currentUser.last_name}
             isInvalid={errors.last_name}
           />
           {!errors.last_name ? null : (
@@ -126,7 +120,7 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
                 setErrors({ ...errors, password: true });
               }
             }}
-            isValid={!errors.password}
+            isValid={!errors.password && currentUser.password}
             isInvalid={errors.password}
           />
           {!errors.password ? null : (
@@ -153,7 +147,7 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
                 setErrors({ ...errors, birth_date: true });
               }
             }}
-            isValid={!errors.birth_date}
+            isValid={!errors.birth_date && currentUser.birth_date}
             isInvalid={errors.birth_date}
           />
           {!errors.birth_date ? null : (
@@ -172,6 +166,7 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
             onChange={(e) =>
               setCurrentUser({ ...currentUser, gender: e.target.value })
             }
+            isValid={currentUser.gender}
           >
             <option disabled selected>
               Select gender
@@ -239,7 +234,14 @@ function SignupForm({ toggleCreate, onClose, onSave }) {
           <Button
             variant="primary"
             onClick={toggleSignupConfirm}
-            disabled={Object.values(errors).some((e) => e)}
+            disabled={
+              Object.values(errors).some((e) => e) ||
+              !currentUser.first_name ||
+              !currentUser.last_name ||
+              !currentUser.birth_date ||
+              !currentUser.password ||
+              !currentUser.gender
+            }
           >
             Submit
           </Button>

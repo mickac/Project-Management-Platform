@@ -10,9 +10,7 @@ function CommentModal({ activeItem, toggleComment, onClose, onSave, userId }) {
   const toggleCommentConfirm = () => {
     setIsConfirm((current) => !current);
   };
-  const [errors, setErrors] = useState({
-    content: true,
-  });
+  const [errors, setErrors] = useState({});
   return (
     <Modal
       show={toggleComment}
@@ -48,7 +46,7 @@ function CommentModal({ activeItem, toggleComment, onClose, onSave, userId }) {
                   setErrors({ ...errors, content: true });
                 }
               }}
-              isValid={!errors.content}
+              isValid={!errors.content && currentItem.content}
               isInvalid={errors.content}
             />
             {!errors.content ? null : (
@@ -82,7 +80,9 @@ function CommentModal({ activeItem, toggleComment, onClose, onSave, userId }) {
               type="submit"
               variant="primary"
               onClick={toggleCommentConfirm}
-              disabled={Object.values(errors).some((e) => e)}
+              disabled={
+                Object.values(errors).some((e) => e) || !currentItem.content
+              }
             >
               Add comment
             </Button>
