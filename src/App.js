@@ -121,7 +121,7 @@ class App extends Component {
     toast.info(`You have been logged out.`, this.state.notificationSettings);
   };
 
-  handleEdit = (item) => {
+  handleEdit = (item, ownership) => {
     if (
       item.title !== "" &&
       item.details !== "" &&
@@ -130,8 +130,9 @@ class App extends Component {
     ) {
       this.editToggle();
       if (item.id) {
+        const data = { ...item, ...ownership };
         axios
-          .put(`/api/pms/projects/${item.id}/`, item, {
+          .put(`/api/pms/projects/${item.id}/`, data, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
@@ -177,9 +178,9 @@ class App extends Component {
       details: item.details,
       start_date: item.start_date,
       end_date: item.end_date,
-    }
-    const members = Object.assign({}, ownership)
-    const data = { ...project, ...members,}
+    };
+    const members = Object.assign({}, ownership);
+    const data = { ...project, ...members };
     axios
       .post("/api/pms/projects/", data, {
         headers: {

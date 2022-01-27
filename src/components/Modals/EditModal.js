@@ -1,12 +1,58 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import { Button, Modal, Form } from "react-bootstrap";
+import Select from "react-select";
 
-function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
+function EditModal({ activeItem, toggleEdit, onClose, onSave, userId }) {
+  const filteredOptions = useRef(true);
   const [currentItem, setCurrentItem] = useState(activeItem); //useForm - na przyszłość
   const [isEditConfirm, setIsEditConfirm] = useState(false);
+  const [currentOwnership, setCurrentOwnership] = useState();
+  const [currentUserList, setCurrentUserList] = useState();
   const toggleEditConfirm = () => {
     setIsEditConfirm((current) => !current);
   };
+  useEffect(() => {
+    axios
+      .get(`/api/pms/ownership/${activeItem.id}/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => setCurrentOwnership(Object.values(res.data)))
+      .catch(() => alert("Something went wrong."));
+    axios
+      .get(`/api/pms/userlist/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => setCurrentUserList(Object.values(res.data)))
+      .catch(() => alert("Something went wrong."));
+  }, []);
+  useEffect(() => {
+    if (currentOwnership && currentUserList && filteredOptions.current) {
+      const owner = currentOwnership.find((element) => element.is_owner);
+      const filteredMembers = currentOwnership
+        .filter((item) => item.user_id !== owner.user_id)
+        .map(({ user_id, full_name }) => ({
+          label: full_name,
+          value: user_id,
+        }));
+      setCurrentOwnership(filteredMembers);
+      const filteredUsers = currentUserList
+        .filter((item) => item.id !== owner.user_id)
+        .map(({ id, first_name, last_name }) => ({
+          label: first_name + " " + last_name,
+          value: id,
+        }));
+      setCurrentUserList(filteredUsers);
+
+      filteredOptions.current = false;
+    }
+    return;
+  }, [currentOwnership, currentUserList]);
+
   const [errors, setErrors] = useState({});
   const validateDate = (start_date, end_date) => {
     if (start_date !== "" && end_date !== "" && end_date >= start_date) {
@@ -122,6 +168,21 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
             </Form.Text>
           )}
         </Form.Group>
+        {!filteredOptions.current && (
+          <>
+            Users in project
+            <Select
+              isMulti
+              name="colors"
+              value={currentOwnership}
+              options={currentUserList}
+              className="basic-multi-select"
+              classNamePrefix="select"
+              onChange={setCurrentOwnership}
+              isDisabled={isEditConfirm}
+            />
+          </>
+        )}
         <Form.Group className="mb-3">
           <Form.Label>Status</Form.Label>
           <Form.Control
@@ -157,7 +218,7 @@ function EditModal({ activeItem, toggleEdit, onClose, onSave }) {
           <Button
             variant="success"
             type="submit"
-            onClick={() => onSave(currentItem)}
+            onClick={() => onSave(currentItem, currentOwnership)}
           >
             Apply Changes
           </Button>

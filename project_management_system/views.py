@@ -79,6 +79,25 @@ class ProjectView(APIView):
             serializer = ProjectSerializer(project, data=request.data)
             if serializer.is_valid():
                 serializer.save()
+                del request.data["title"]
+                del request.data["details"]
+                del request.data["start_date"]
+                del request.data["end_date"]
+                del request.data["id"]
+                del request.data["status"]
+                del request.data["added"]
+                ProjectOwnership.objects.filter(project_id=pk).exclude(
+                    user_id=request.user
+                ).delete()
+                for i in request.data:
+                    member = {
+                        "project_id": pk,
+                        "user_id": request.data[i]["value"],
+                        "is_owner": False,
+                    }
+                    member_serializer = ProjectOwnershipSerializer(data=member)
+                    if member_serializer.is_valid():
+                        member_serializer.save()
                 return Response(serializer.data, status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -176,13 +195,11 @@ class OwnershipView(APIView):
         try:
             user = User.objects.filter(email=request.user).first()
             ownership = ProjectOwnership.objects.filter(project_id=pk)
-            print(ownership)
             project_member = (
                 ProjectOwnership.objects.filter(user_id=user)
                 .filter(project_id=pk)
                 .first()
             )
-            print(project_member)
             if project_member == None:
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
             serializer = ProjectOwnershipSerializer(ownership, many=True)
