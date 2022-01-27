@@ -36,7 +36,6 @@ class ProjectView(APIView):
                 "start_date": request.data["start_date"],
                 "end_date": request.data["end_date"],
             }
-            print(request.user.id)
             serializer = ProjectSerializer(data=project)
             if serializer.is_valid():
                 serializer.save()
@@ -100,13 +99,25 @@ class CommentsView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk, format=None):
-        comments = (
-            Comments.objects.filter(project_id=pk)
-            .order_by("added")
-            .select_related("user_id")
-        )
-        serializer = CommentsSerializer(comments, many=True)
-        return Response(serializer.data, status.HTTP_200_OK)
+        try:
+            user = User.objects.filter(email=request.user).first()
+            project_member = (
+                ProjectOwnership.objects.filter(project_id=pk)
+                .filter(user_id=user)
+                .first()
+            )
+            print(user, project_member)
+            if project_member == None:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            comments = (
+                Comments.objects.filter(project_id=pk)
+                .order_by("added")
+                .select_related("user_id")
+            )
+            serializer = CommentsSerializer(comments, many=True)
+            return Response(serializer.data, status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def post(self, request, pk=None, format=None):
         try:
@@ -117,7 +128,6 @@ class CommentsView(APIView):
                 .filter(user_id=request.user)
                 .first()
             )
-            print(project_member)
             project_member_validation = (
                 ProjectOwnership.objects.filter(project_id=request.data["project_id"])
                 .filter(user_id=request.data["user_id"])
